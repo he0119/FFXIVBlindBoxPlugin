@@ -1,6 +1,7 @@
 ﻿using Dalamud.Configuration;
 using Dalamud.Plugin;
 using System;
+using System.Collections.Generic;
 
 namespace BlindBox
 {
@@ -9,7 +10,10 @@ namespace BlindBox
     {
         public int Version { get; set; } = 0;
 
-        public bool SomePropertyToBeSavedAndWithADefault { get; set; } = true;
+        // 已经拥有的宠物
+        public List<string> Minions = new();
+        // 已经拥有的坐骑
+        public List<string> Mounts = new();
 
         // the below exist just to make saving less cumbersome
 

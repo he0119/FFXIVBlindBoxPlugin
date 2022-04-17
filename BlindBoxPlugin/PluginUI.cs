@@ -8,9 +8,7 @@ namespace BlindBox
     // to do any cleanup
     class PluginUI : IDisposable
     {
-        private Configuration configuration;
-
-        private ImGuiScene.TextureWrap goatImage;
+        private readonly Configuration configuration;
 
         // this extra bool exists for ImGui, since you can't ref a property
         private bool visible = false;
@@ -28,15 +26,13 @@ namespace BlindBox
         }
 
         // passing in the image here just for simplicity
-        public PluginUI(Configuration configuration, ImGuiScene.TextureWrap goatImage)
+        public PluginUI(Configuration configuration)
         {
             this.configuration = configuration;
-            this.goatImage = goatImage;
         }
 
         public void Dispose()
         {
-            this.goatImage.Dispose();
         }
 
         public void Draw()
@@ -63,19 +59,13 @@ namespace BlindBox
             ImGui.SetNextWindowSizeConstraints(new Vector2(375, 330), new Vector2(float.MaxValue, float.MaxValue));
             if (ImGui.Begin("盲盒信息", ref this.visible, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
             {
-                ImGui.Text($"不知道什么用的配置为 {this.configuration.SomePropertyToBeSavedAndWithADefault}");
+                ImGui.Text($"拥有的宠物数量 {configuration.Minions.Count}");
+                ImGui.Text($"拥有的坐骑数量 {configuration.Mounts.Count}");
 
                 if (ImGui.Button("打开设置"))
                 {
                     SettingsVisible = true;
                 }
-
-                ImGui.Spacing();
-
-                ImGui.Text("Have a goat:");
-                ImGui.Indent(55);
-                ImGui.Image(this.goatImage.ImGuiHandle, new Vector2(this.goatImage.Width, this.goatImage.Height));
-                ImGui.Unindent(55);
             }
             ImGui.End();
         }
@@ -91,14 +81,7 @@ namespace BlindBox
             if (ImGui.Begin("设置", ref this.settingsVisible,
                 ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
             {
-                // can't ref a property, so use a local copy
-                var configValue = this.configuration.SomePropertyToBeSavedAndWithADefault;
-                if (ImGui.Checkbox("不知道什么用的配置", ref configValue))
-                {
-                    this.configuration.SomePropertyToBeSavedAndWithADefault = configValue;
-                    // can save immediately on change, if you don't want to provide a "Save and Close" button
-                    this.configuration.Save();
-                }
+                ImGui.Text("这里空空如也。");
             }
             ImGui.End();
         }
