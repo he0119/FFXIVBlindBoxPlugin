@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Authors></Authors>
+    <Authors>he0119</Authors>
     <Company></Company>
-    <Version>0.0.0.1</Version>
+    <Version>1.0.0.0</Version>
     <Description>A blind box plugin.</Description>
     <Copyright></Copyright>
     <PackageProjectUrl>https://github.com/he0119/FFXIVBlindBoxPlugin</PackageProjectUrl>
@@ -19,18 +19,12 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Content Include="..\Data\BlindBoxPlugin.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
   <PropertyGroup>
     <DalamudLibPath>C:\Users\hmy01\Games\Tools\Dalamud\6.3.0.9\</DalamudLibPath>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DalamudPackager" Version="2.1.6" />
+    <PackageReference Include="DalamudPackager" Version="2.1.7" />
     <Reference Include="FFXIVClientStructs">
       <HintPath>$(DalamudLibPath)FFXIVClientStructs.dll</HintPath>
       <Private>false</Private>
