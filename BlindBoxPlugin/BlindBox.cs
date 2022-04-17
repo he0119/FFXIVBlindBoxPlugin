@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-namespace BlindBox
+namespace BlindBoxPlugin
 {
     public sealed class BlindBox : IDalamudPlugin
     {

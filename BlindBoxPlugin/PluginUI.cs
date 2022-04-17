@@ -1,8 +1,9 @@
 ﻿using ImGuiNET;
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 
-namespace BlindBox
+namespace BlindBoxPlugin
 {
     // It is good to have this be disposable in general, in case you ever need it
     // to do any cleanup
@@ -55,16 +56,50 @@ namespace BlindBox
                 return;
             }
 
-            ImGui.SetNextWindowSize(new Vector2(375, 330), ImGuiCond.FirstUseEver);
-            ImGui.SetNextWindowSizeConstraints(new Vector2(375, 330), new Vector2(float.MaxValue, float.MaxValue));
-            if (ImGui.Begin("盲盒信息", ref this.visible, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
+            ImGui.SetNextWindowSize(new Vector2(600, 400), ImGuiCond.FirstUseEver);
+            ImGui.SetNextWindowSizeConstraints(new Vector2(600, 400), new Vector2(float.MaxValue, float.MaxValue));
+            if (ImGui.Begin("盲盒信息", ref visible,
+                ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
             {
                 ImGui.Text($"拥有的宠物数量 {configuration.Minions.Count}");
                 ImGui.Text($"拥有的坐骑数量 {configuration.Mounts.Count}");
 
-                if (ImGui.Button("打开设置"))
+                var BlindBoxData = new BlindBoxData();
+
+                List<string> MyItem = new List<string>();
+                MyItem.AddRange(configuration.Minions);
+                MyItem.AddRange(configuration.Mounts);
+
+
+                if (ImGui.BeginTabBar("BlindBoxTabBar", ImGuiTabBarFlags.AutoSelectNewTabs))
                 {
-                    SettingsVisible = true;
+                    if (ImGui.BeginTabItem("特殊配给货箱（红莲）"))
+                    {
+                        ImGui.BeginChild("物品", new Vector2(-1, -1), false);
+                        foreach (var item in BlindBoxData.MaterielContainer40)
+                        {
+                            if (!MyItem.Contains(item))
+                            {
+                                ImGui.Text(item);
+                            }
+                        }
+                        ImGui.EndChild();
+                        ImGui.EndTabItem();
+                    }
+
+                    if (ImGui.BeginTabItem("特殊配给货箱（重生/苍穹）"))
+                    {
+                        ImGui.BeginChild("物品", new Vector2(-1, -1), false);
+                        foreach (var item in BlindBoxData.MaterielContainer30)
+                        {
+                            if (!MyItem.Contains(item))
+                            {
+                                ImGui.Text(item);
+                            }
+                        }
+                        ImGui.EndChild();
+                        ImGui.EndTabItem();
+                    }
                 }
             }
             ImGui.End();
