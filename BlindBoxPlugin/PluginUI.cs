@@ -2,7 +2,7 @@
 using System;
 using System.Numerics;
 
-namespace BlindBoxPlugin
+namespace BlindBox
 {
     // It is good to have this be disposable in general, in case you ever need it
     // to do any cleanup
@@ -61,11 +61,11 @@ namespace BlindBoxPlugin
 
             ImGui.SetNextWindowSize(new Vector2(375, 330), ImGuiCond.FirstUseEver);
             ImGui.SetNextWindowSizeConstraints(new Vector2(375, 330), new Vector2(float.MaxValue, float.MaxValue));
-            if (ImGui.Begin("My Amazing Window", ref this.visible, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
+            if (ImGui.Begin("盲盒信息", ref this.visible, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
             {
-                ImGui.Text($"The random config bool is {this.configuration.SomePropertyToBeSavedAndWithADefault}");
+                ImGui.Text($"不知道什么用的配置为 {this.configuration.SomePropertyToBeSavedAndWithADefault}");
 
-                if (ImGui.Button("Show Settings"))
+                if (ImGui.Button("打开设置"))
                 {
                     SettingsVisible = true;
                 }
@@ -88,12 +88,12 @@ namespace BlindBoxPlugin
             }
 
             ImGui.SetNextWindowSize(new Vector2(232, 75), ImGuiCond.Always);
-            if (ImGui.Begin("A Wonderful Configuration Window", ref this.settingsVisible,
+            if (ImGui.Begin("设置", ref this.settingsVisible,
                 ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
             {
                 // can't ref a property, so use a local copy
                 var configValue = this.configuration.SomePropertyToBeSavedAndWithADefault;
-                if (ImGui.Checkbox("Random Config Bool", ref configValue))
+                if (ImGui.Checkbox("不知道什么用的配置", ref configValue))
                 {
                     this.configuration.SomePropertyToBeSavedAndWithADefault = configValue;
                     // can save immediately on change, if you don't want to provide a "Save and Close" button

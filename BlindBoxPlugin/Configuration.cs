@@ -2,7 +2,7 @@
 using Dalamud.Plugin;
 using System;
 
-namespace BlindBoxPlugin
+namespace BlindBox
 {
     [Serializable]
     public class Configuration : IPluginConfiguration
