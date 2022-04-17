@@ -8,7 +8,7 @@ namespace BlindBoxPlugin
 {
     public sealed class Plugin : IDalamudPlugin
     {
-        public string Name => "Blind Box Plugin";
+        public string Name => "Blind Box";
 
         private const string commandName = "/blindbox";
 
@@ -34,7 +34,7 @@ namespace BlindBoxPlugin
 
             this.CommandManager.AddHandler(commandName, new CommandInfo(OnCommand)
             {
-                HelpMessage = "A useful message to display in /xlhelp"
+                HelpMessage = "显示盲盒中物品信息。"
             });
 
             this.PluginInterface.UiBuilder.Draw += DrawUI;
