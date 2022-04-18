@@ -12,6 +12,8 @@ namespace BlindBoxPlugin
 
         // 打开界面时自动更新获得物品信息
         public bool AutoUpdate { get; set; } = true;
+        // 显示盲盒物品模式
+        public DisplayMode DisplayMode { get; set; } = DisplayMode.Missing;
 
         // 已经拥有的宠物
         public List<string> Minions = new();

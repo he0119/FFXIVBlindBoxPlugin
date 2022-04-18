@@ -64,32 +64,23 @@ namespace BlindBoxPlugin
                 AcquiredItems.AddRange(configuration.Minions);
                 AcquiredItems.AddRange(configuration.Mounts);
 
-                ImGui.Text($"特殊配给货箱（红莲）：{BlindBoxData.MaterielContainer40.Except(AcquiredItems).Count()}/{BlindBoxData.MaterielContainer40.Count}");
-                ImGui.Text($"特殊配给货箱（重生/苍穹）：{BlindBoxData.MaterielContainer30.Except(AcquiredItems).Count()}/{BlindBoxData.MaterielContainer30.Count}");
+                ImGui.Text($"特殊配给货箱（红莲）：{BlindBoxData.MaterielContainer40.Intersect(AcquiredItems).Count()}/{BlindBoxData.MaterielContainer40.Count}");
+                ImGui.Text($"特殊配给货箱（重生/苍穹）：{BlindBoxData.MaterielContainer30.Intersect(AcquiredItems).Count()}/{BlindBoxData.MaterielContainer30.Count}");
+
+                var displayModes = Enum.GetNames<DisplayMode>();
+                var displayModeIndex = (int)configuration.DisplayMode;
+                if (ImGui.Combo("显示物品的种类", ref displayModeIndex, DisplayModeNames.Names(), displayModes.Length))
+                {
+                    configuration.DisplayMode = (DisplayMode)displayModeIndex;
+                    configuration.Save();
+                }
 
                 if (ImGui.BeginTabBar("BlindBoxTabBar", ImGuiTabBarFlags.AutoSelectNewTabs))
                 {
-                    if (ImGui.BeginTabItem("特殊配给货箱（红莲）"))
-                    {
-                        ImGui.BeginChild("物品", new Vector2(-1, -1), false);
-                        foreach (var item in BlindBoxData.MaterielContainer40.Except(AcquiredItems))
-                        {
-                            ImGui.Text(item);
-                        }
-                        ImGui.EndChild();
-                        ImGui.EndTabItem();
-                    }
+                    DrawBlindBoxItemTab("特殊配给货箱（红莲）", BlindBoxData.MaterielContainer40, AcquiredItems);
+                    DrawBlindBoxItemTab("特殊配给货箱（重生/苍穹）", BlindBoxData.MaterielContainer30, AcquiredItems);
 
-                    if (ImGui.BeginTabItem("特殊配给货箱（重生/苍穹）"))
-                    {
-                        ImGui.BeginChild("物品", new Vector2(-1, -1), false);
-                        foreach (var item in BlindBoxData.MaterielContainer30.Except(AcquiredItems))
-                        {
-                            ImGui.Text(item);
-                        }
-                        ImGui.EndChild();
-                        ImGui.EndTabItem();
-                    }
+                    ImGui.EndTabBar();
                 }
             }
             ImGui.End();
@@ -108,14 +99,52 @@ namespace BlindBoxPlugin
             {
                 // can't ref a property, so use a local copy
                 var autoUpdate = configuration.AutoUpdate;
-                if (ImGui.Checkbox("打开页面时自动更新", ref autoUpdate))
+                if (ImGui.Checkbox("自动更新", ref autoUpdate))
                 {
                     configuration.AutoUpdate = autoUpdate;
                     // can save immediately on change, if you don't want to provide a "Save and Close" button
                     configuration.Save();
                 }
+                if (ImGui.IsItemHovered())
+                {
+                    ImGui.SetTooltip("是否在打开页面时自动更新盲盒数据。");
+                }
             }
             ImGui.End();
+        }
+
+        private void DrawBlindBoxItemTab(string label, List<string> blindbox, List<string> acquiredItems)
+        {
+            if (ImGui.BeginTabItem(label))
+            {
+                ImGui.BeginChild("物品", new Vector2(-1, -1), false);
+                switch (configuration.DisplayMode)
+                {
+                    case DisplayMode.All:
+                        foreach (var item in blindbox)
+                        {
+                            ImGui.Text(item);
+                        }
+                        break;
+                    case DisplayMode.Acquired:
+                        foreach (var item in blindbox.Intersect(acquiredItems))
+                        {
+                            ImGui.Text(item);
+                        }
+                        break;
+                    case DisplayMode.Missing:
+                        foreach (var item in blindbox.Except(acquiredItems))
+                        {
+                            ImGui.Text(item);
+                        }
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+
+                }
+                ImGui.EndChild();
+                ImGui.EndTabItem();
+            }
         }
     }
 }
