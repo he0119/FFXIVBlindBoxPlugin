@@ -1,6 +1,7 @@
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 
 namespace BlindBoxPlugin
@@ -63,17 +64,17 @@ namespace BlindBoxPlugin
                 AcquiredItems.AddRange(configuration.Minions);
                 AcquiredItems.AddRange(configuration.Mounts);
 
+                ImGui.Text($"特殊配给货箱（红莲）：{BlindBoxData.MaterielContainer40.Except(AcquiredItems).Count()}/{BlindBoxData.MaterielContainer40.Count}");
+                ImGui.Text($"特殊配给货箱（重生/苍穹）：{BlindBoxData.MaterielContainer30.Except(AcquiredItems).Count()}/{BlindBoxData.MaterielContainer30.Count}");
+
                 if (ImGui.BeginTabBar("BlindBoxTabBar", ImGuiTabBarFlags.AutoSelectNewTabs))
                 {
                     if (ImGui.BeginTabItem("特殊配给货箱（红莲）"))
                     {
                         ImGui.BeginChild("物品", new Vector2(-1, -1), false);
-                        foreach (var item in BlindBoxData.MaterielContainer40)
+                        foreach (var item in BlindBoxData.MaterielContainer40.Except(AcquiredItems))
                         {
-                            if (!AcquiredItems.Contains(item))
-                            {
-                                ImGui.Text(item);
-                            }
+                            ImGui.Text(item);
                         }
                         ImGui.EndChild();
                         ImGui.EndTabItem();
@@ -82,12 +83,9 @@ namespace BlindBoxPlugin
                     if (ImGui.BeginTabItem("特殊配给货箱（重生/苍穹）"))
                     {
                         ImGui.BeginChild("物品", new Vector2(-1, -1), false);
-                        foreach (var item in BlindBoxData.MaterielContainer30)
+                        foreach (var item in BlindBoxData.MaterielContainer30.Except(AcquiredItems))
                         {
-                            if (!AcquiredItems.Contains(item))
-                            {
-                                ImGui.Text(item);
-                            }
+                            ImGui.Text(item);
                         }
                         ImGui.EndChild();
                         ImGui.EndTabItem();
