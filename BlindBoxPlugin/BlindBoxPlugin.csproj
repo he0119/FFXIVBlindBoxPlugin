@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Authors>he0119</Authors>
     <Company></Company>
-    <Version>1.2.0.0</Version>
+    <Version>1.2.0.1</Version>
     <Description>A blind box plugin.</Description>
     <Copyright></Copyright>
     <PackageProjectUrl>https://github.com/he0119/FFXIVBlindBoxPlugin</PackageProjectUrl>
