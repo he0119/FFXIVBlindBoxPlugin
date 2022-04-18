@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace BlindBoxPlugin
 {
     internal class BlindBoxData
     {
-        public List<string> MaterielContainer40 = new()
+        public static List<string> MaterielContainer40 = new()
         {
             "飞行座椅",
             "渡渡鸟角笛",
@@ -64,7 +64,7 @@ namespace BlindBoxPlugin
             "小刺猬"
         };
 
-        public List<string> MaterielContainer30 = new()
+        public static List<string> MaterielContainer30 = new()
         {
             "祖角笛",
             "黑天马笛",

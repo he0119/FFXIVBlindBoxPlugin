@@ -1,4 +1,4 @@
-﻿using ImGuiNET;
+using ImGuiNET;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -15,15 +15,15 @@ namespace BlindBoxPlugin
         private bool visible = false;
         public bool Visible
         {
-            get { return this.visible; }
-            set { this.visible = value; }
+            get { return visible; }
+            set { visible = value; }
         }
 
         private bool settingsVisible = false;
         public bool SettingsVisible
         {
-            get { return this.settingsVisible; }
-            set { this.settingsVisible = value; }
+            get { return settingsVisible; }
+            set { settingsVisible = value; }
         }
 
         // passing in the image here just for simplicity
@@ -32,9 +32,7 @@ namespace BlindBoxPlugin
             this.configuration = configuration;
         }
 
-        public void Dispose()
-        {
-        }
+        public void Dispose() { }
 
         public void Draw()
         {
@@ -61,15 +59,9 @@ namespace BlindBoxPlugin
             if (ImGui.Begin("盲盒信息", ref visible,
                 ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
             {
-                ImGui.Text($"拥有的宠物数量 {configuration.Minions.Count}");
-                ImGui.Text($"拥有的坐骑数量 {configuration.Mounts.Count}");
-
-                var BlindBoxData = new BlindBoxData();
-
-                List<string> MyItem = new List<string>();
-                MyItem.AddRange(configuration.Minions);
-                MyItem.AddRange(configuration.Mounts);
-
+                List<string> AcquiredItems = new();
+                AcquiredItems.AddRange(configuration.Minions);
+                AcquiredItems.AddRange(configuration.Mounts);
 
                 if (ImGui.BeginTabBar("BlindBoxTabBar", ImGuiTabBarFlags.AutoSelectNewTabs))
                 {
@@ -78,7 +70,7 @@ namespace BlindBoxPlugin
                         ImGui.BeginChild("物品", new Vector2(-1, -1), false);
                         foreach (var item in BlindBoxData.MaterielContainer40)
                         {
-                            if (!MyItem.Contains(item))
+                            if (!AcquiredItems.Contains(item))
                             {
                                 ImGui.Text(item);
                             }
@@ -92,7 +84,7 @@ namespace BlindBoxPlugin
                         ImGui.BeginChild("物品", new Vector2(-1, -1), false);
                         foreach (var item in BlindBoxData.MaterielContainer30)
                         {
-                            if (!MyItem.Contains(item))
+                            if (!AcquiredItems.Contains(item))
                             {
                                 ImGui.Text(item);
                             }
@@ -113,10 +105,17 @@ namespace BlindBoxPlugin
             }
 
             ImGui.SetNextWindowSize(new Vector2(232, 75), ImGuiCond.Always);
-            if (ImGui.Begin("设置", ref this.settingsVisible,
+            if (ImGui.Begin("设置", ref settingsVisible,
                 ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
             {
-                ImGui.Text("这里空空如也。");
+                // can't ref a property, so use a local copy
+                var autoUpdate = configuration.AutoUpdate;
+                if (ImGui.Checkbox("打开页面时自动更新", ref autoUpdate))
+                {
+                    configuration.AutoUpdate = autoUpdate;
+                    // can save immediately on change, if you don't want to provide a "Save and Close" button
+                    configuration.Save();
+                }
             }
             ImGui.End();
         }
