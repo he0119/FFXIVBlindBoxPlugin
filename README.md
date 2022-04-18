@@ -1,2 +1,3 @@
-# FFXIVBlindBoxPlugin
-最终幻想14盲盒插件
+# BlindBoxPlugin
+
+最终幻想14 盲盒插件
