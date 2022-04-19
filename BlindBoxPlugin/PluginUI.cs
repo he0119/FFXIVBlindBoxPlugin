@@ -93,8 +93,8 @@ namespace BlindBoxPlugin
                 return;
             }
 
-            ImGui.SetNextWindowSize(new Vector2(232, 75), ImGuiCond.Always);
-            if (ImGui.Begin("设置", ref settingsVisible,
+            ImGui.SetNextWindowSize(new Vector2(230, 75), ImGuiCond.Always);
+            if (ImGui.Begin("盲盒设置", ref settingsVisible,
                 ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
             {
                 // can't ref a property, so use a local copy
@@ -107,7 +107,7 @@ namespace BlindBoxPlugin
                 }
                 if (ImGui.IsItemHovered())
                 {
-                    ImGui.SetTooltip("是否在打开页面时自动更新盲盒数据。");
+                    ImGui.SetTooltip("是否在打开信息界面时自动更新盲盒数据。");
                 }
             }
             ImGui.End();
@@ -117,7 +117,7 @@ namespace BlindBoxPlugin
         {
             if (ImGui.BeginTabItem(label))
             {
-                ImGui.BeginChild("物品", new Vector2(-1, -1), false);
+                ImGui.BeginChild("items", new Vector2(-1, -1), false);
                 switch (configuration.DisplayMode)
                 {
                     case DisplayMode.All:

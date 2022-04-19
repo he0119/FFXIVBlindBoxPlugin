@@ -40,7 +40,7 @@ namespace BlindBoxPlugin
 
             CommandManager.AddHandler(commandName, new CommandInfo(OnCommand)
             {
-                HelpMessage = "显示盲盒中物品信息。"
+                HelpMessage = "打开盲盒信息界面。"
             });
 
             PluginInterface.UiBuilder.Draw += Draw;
