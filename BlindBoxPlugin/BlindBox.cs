@@ -2,6 +2,7 @@ using Dalamud.Data;
 using Dalamud.Game;
 using Dalamud.Game.Command;
 using Dalamud.Game.Gui;
+using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
 using Dalamud.Plugin;
 using Lumina.Excel.GeneratedSheets;
@@ -23,7 +24,10 @@ namespace BlindBoxPlugin
         [PluginService] public static SigScanner SigScanner { get; private set; } = null!;
 
         private Configuration Configuration { get; init; }
-        private PluginUI PluginUi { get; init; }
+
+        private readonly WindowSystem windowSystem = new("BlindBox");
+        private readonly StatusWindow statusWindow;
+        private readonly ConfigWindow configWindow;
 
         private delegate byte HasItemActionUnlockedDelegate(IntPtr mem);
         private readonly HasItemActionUnlockedDelegate _hasItemActionUnlocked;
@@ -36,7 +40,10 @@ namespace BlindBoxPlugin
             Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
             Configuration.Initialize(PluginInterface);
 
-            PluginUi = new PluginUI(Configuration);
+            statusWindow = new StatusWindow(Configuration);
+            configWindow = new ConfigWindow(Configuration);
+            windowSystem.AddWindow(statusWindow);
+            windowSystem.AddWindow(configWindow);
 
             CommandManager.AddHandler(commandName, new CommandInfo(OnCommand)
             {
@@ -61,10 +68,10 @@ namespace BlindBoxPlugin
 
         public void Dispose()
         {
-            PluginUi.Dispose();
+            CommandManager.RemoveHandler(commandName);
+            windowSystem.RemoveAllWindows();
             PluginInterface.UiBuilder.Draw -= Draw;
             PluginInterface.UiBuilder.OpenConfigUi -= OpenConfigUi;
-            CommandManager.RemoveHandler(commandName);
         }
 
         private void OnCommand(string command, string args)
@@ -74,13 +81,13 @@ namespace BlindBoxPlugin
             {
                 UpdateAcquiredList();
             }
-            else if (args == "settings")
+            else if (args == "config")
             {
-                PluginUi.SettingsVisible = true;
+                configWindow.IsOpen = true;
             }
             else
             {
-                PluginUi.Visible = true;
+                statusWindow.IsOpen = true;
                 if (Configuration.AutoUpdate)
                 {
                     UpdateAcquiredList();
@@ -90,12 +97,12 @@ namespace BlindBoxPlugin
 
         private void Draw()
         {
-            PluginUi.Draw();
+            windowSystem.Draw();
         }
 
         private void OpenConfigUi()
         {
-            PluginUi.SettingsVisible = true;
+            configWindow.IsOpen = true;
         }
 
         // https://github.com/VergilGao/GoodMemoryCN/blob/master/GoodMemory/GameFunctions.cs
