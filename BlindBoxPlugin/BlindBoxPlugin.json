@@ -2,7 +2,7 @@
   "Author": "he0119",
   "Name": "Blind Box",
   "Punchline": "查看盲盒中物品的获得情况。",
-  "Description": "用来统计盲盒中物品获得情况的插件。\n/blindbox 打开盲盒信息界面。\n/blindbox update 手动刷新数据。\n/blindbox settings 打开设置界面。",
+  "Description": "用来统计盲盒中物品获得情况的插件。\n/blindbox 打开盲盒信息界面。\n/blindbox update 手动刷新数据。\n/blindbox config 打开设置界面。",
   "InternalName": "BlindBoxPlugin",
   "RepoUrl": "https://github.com/he0119/FFXIVBlindBoxPlugin/",
   "IconUrl": "https://raw.githubusercontent.com/he0119/FFXIVBlindBoxPlugin/main/images/icon.png",
