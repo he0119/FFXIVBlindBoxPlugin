@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - "main"
+  pull_request:
+    branches:
+      - "main"
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    - name: Download latest Dalamud build
+      run: |
+        curl -O https://goatcorp.github.io/dalamud-distrib/latest.zip
+        mkdir BlindBoxPlugin/Dalamud
+        unzip latest.zip -d ./BlindBoxPlugin/Dalamud
+    - uses: actions/checkout@v2
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build -c Release
