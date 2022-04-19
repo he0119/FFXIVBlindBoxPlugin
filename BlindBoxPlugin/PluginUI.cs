@@ -60,12 +60,8 @@ namespace BlindBoxPlugin
             if (ImGui.Begin("盲盒信息", ref visible,
                 ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
             {
-                List<string> AcquiredItems = new();
-                AcquiredItems.AddRange(configuration.Minions);
-                AcquiredItems.AddRange(configuration.Mounts);
-
-                ImGui.Text($"特殊配给货箱（红莲）：{BlindBoxData.MaterielContainer40.Intersect(AcquiredItems).Count()}/{BlindBoxData.MaterielContainer40.Count}");
-                ImGui.Text($"特殊配给货箱（重生/苍穹）：{BlindBoxData.MaterielContainer30.Intersect(AcquiredItems).Count()}/{BlindBoxData.MaterielContainer30.Count}");
+                ImGui.Text($"特殊配给货箱（红莲）：{BlindBoxData.MaterielContainer40.Intersect(configuration.AcquiredItems).Count()}/{BlindBoxData.MaterielContainer40.Count}");
+                ImGui.Text($"特殊配给货箱（重生/苍穹）：{BlindBoxData.MaterielContainer30.Intersect(configuration.AcquiredItems).Count()}/{BlindBoxData.MaterielContainer30.Count}");
 
                 var displayModes = Enum.GetNames<DisplayMode>();
                 var displayModeIndex = (int)configuration.DisplayMode;
@@ -77,8 +73,8 @@ namespace BlindBoxPlugin
 
                 if (ImGui.BeginTabBar("BlindBoxTabBar", ImGuiTabBarFlags.AutoSelectNewTabs))
                 {
-                    DrawBlindBoxItemTab("特殊配给货箱（红莲）", BlindBoxData.MaterielContainer40, AcquiredItems);
-                    DrawBlindBoxItemTab("特殊配给货箱（重生/苍穹）", BlindBoxData.MaterielContainer30, AcquiredItems);
+                    DrawBlindBoxItemTab("特殊配给货箱（红莲）", BlindBoxData.MaterielContainer40);
+                    DrawBlindBoxItemTab("特殊配给货箱（重生/苍穹）", BlindBoxData.MaterielContainer30);
 
                     ImGui.EndTabBar();
                 }
@@ -113,7 +109,7 @@ namespace BlindBoxPlugin
             ImGui.End();
         }
 
-        private void DrawBlindBoxItemTab(string label, List<string> blindbox, List<string> acquiredItems)
+        private void DrawBlindBoxItemTab(string label, List<string> blindbox)
         {
             if (ImGui.BeginTabItem(label))
             {
@@ -127,13 +123,13 @@ namespace BlindBoxPlugin
                         }
                         break;
                     case DisplayMode.Acquired:
-                        foreach (var item in blindbox.Intersect(acquiredItems))
+                        foreach (var item in blindbox.Intersect(configuration.AcquiredItems))
                         {
                             ImGui.Text(item);
                         }
                         break;
                     case DisplayMode.Missing:
-                        foreach (var item in blindbox.Except(acquiredItems))
+                        foreach (var item in blindbox.Except(configuration.AcquiredItems))
                         {
                             ImGui.Text(item);
                         }

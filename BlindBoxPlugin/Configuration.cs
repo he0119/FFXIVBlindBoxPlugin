@@ -21,6 +21,16 @@ namespace BlindBoxPlugin
         public List<string> Mounts = new();
 
         // the below exist just to make saving less cumbersome
+        public List<string> AcquiredItems
+        {
+            get
+            {
+                List<string> acquiredItems = new();
+                acquiredItems.AddRange(Minions);
+                acquiredItems.AddRange(Mounts);
+                return acquiredItems;
+            }
+        }
 
         [NonSerialized]
         private DalamudPluginInterface? pluginInterface;
