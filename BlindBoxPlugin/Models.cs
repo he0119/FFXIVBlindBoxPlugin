@@ -13,9 +13,9 @@ namespace BlindBoxPlugin
         {
             return new[]
             {
-               "所有",
-               "已获得",
-               "未获得"
+                "所有",
+                "已获得",
+                "未获得"
             };
         }
     }
