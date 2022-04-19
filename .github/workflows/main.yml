@@ -8,10 +8,17 @@ on:
     branches:
       - "main"
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
+    name: Build
     runs-on: windows-latest
     steps:
+    - name: Checkout
+      uses: actions/checkout@v2
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
@@ -21,7 +28,6 @@ jobs:
         curl -O https://goatcorp.github.io/dalamud-distrib/latest.zip
         mkdir BlindBoxPlugin/Dalamud
         unzip latest.zip -d ./BlindBoxPlugin/Dalamud
-    - uses: actions/checkout@v2
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
