@@ -12,6 +12,7 @@
   <PropertyGroup>
     <TargetFramework>net5.0-windows</TargetFramework>
     <Platforms>x64</Platforms>
+    <PlatformTarget>x64</PlatformTarget>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -20,7 +21,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <DalamudLibPath>C:\Users\hmy01\Games\Tools\Dalamud\6.3.0.9\</DalamudLibPath>
+    <DalamudLibPath>$(Project)Dalamud\</DalamudLibPath>
   </PropertyGroup>
 
   <ItemGroup>

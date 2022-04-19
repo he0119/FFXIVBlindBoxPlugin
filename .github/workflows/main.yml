@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - "main"
+  pull_request:
+    branches:
+      - "main"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build
+    runs-on: windows-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    - name: Download latest Dalamud build
+      run: |
+        curl -O https://goatcorp.github.io/dalamud-distrib/latest.zip
+        mkdir BlindBoxPlugin/Dalamud
+        unzip latest.zip -d ./BlindBoxPlugin/Dalamud
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build -c Release -o build
+    - name: Upload Files
+      uses: actions/upload-artifact@v3
+      with:
+        name: BlindBoxPlugin
+        path: ${{ github.workspace }}/build/BlindBoxPlugin/
