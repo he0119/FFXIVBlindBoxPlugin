@@ -23,7 +23,7 @@ namespace BlindBoxPlugin
         [PluginService] public static ChatGui Chat { get; private set; } = null!;
         [PluginService] public static SigScanner SigScanner { get; private set; } = null!;
 
-        private Configuration Configuration { get; init; }
+        private readonly Configuration configuration;
 
         private readonly WindowSystem windowSystem = new("BlindBox");
         private readonly StatusWindow statusWindow;
@@ -37,11 +37,11 @@ namespace BlindBoxPlugin
 
         public BlindBox()
         {
-            Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
-            Configuration.Initialize(PluginInterface);
+            configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
+            configuration.Initialize(PluginInterface);
 
-            statusWindow = new StatusWindow(Configuration);
-            configWindow = new ConfigWindow(Configuration);
+            statusWindow = new StatusWindow(configuration);
+            configWindow = new ConfigWindow(configuration);
             windowSystem.AddWindow(statusWindow);
             windowSystem.AddWindow(configWindow);
 
@@ -88,7 +88,7 @@ namespace BlindBoxPlugin
             else
             {
                 statusWindow.IsOpen = true;
-                if (Configuration.AutoUpdate)
+                if (configuration.AutoUpdate)
                 {
                     UpdateAcquiredList();
                 }
@@ -131,9 +131,9 @@ namespace BlindBoxPlugin
             }
 
             // 保存已有物品数据
-            Configuration.Minions = minions;
-            Configuration.Mounts = mounts;
-            Configuration.Save();
+            configuration.Minions = minions;
+            configuration.Mounts = mounts;
+            configuration.Save();
 
             Chat.Print("盲盒数据更新成功！");
         }
