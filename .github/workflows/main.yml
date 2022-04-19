@@ -31,4 +31,9 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build -c Release
+      run: dotnet build -c Release -o build
+    - name: Upload Files
+      uses: actions/upload-artifact@v3
+      with:
+        name: BlindBoxPlugin
+        path: ${{ github.workspace }}/build/BlindBoxPlugin/
