@@ -2,11 +2,15 @@ using Dalamud.Data;
 using Dalamud.Game;
 using Dalamud.Game.Command;
 using Dalamud.Game.Gui;
+using Dalamud.Game.Text.SeStringHandling.Payloads;
 using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
 using Dalamud.Plugin;
 using Lumina.Excel.GeneratedSheets;
 using System.Collections.Generic;
+using System.Linq;
+using XivCommon;
+using XivCommon.Functions.Tooltips;
 
 namespace BlindBoxPlugin
 {
@@ -22,7 +26,9 @@ namespace BlindBoxPlugin
         [PluginService] public static SigScanner SigScanner { get; private set; } = null!;
 
         private readonly Configuration configuration;
-        private readonly GameFunctions gameFunctions;
+
+        private readonly GameFunctions GameFunctions;
+        private readonly XivCommonBase Common;
 
         private readonly WindowSystem windowSystem = new("BlindBox");
         private readonly StatusWindow statusWindow;
@@ -32,7 +38,9 @@ namespace BlindBoxPlugin
         {
             configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
             configuration.Initialize(PluginInterface);
-            gameFunctions = new GameFunctions(DataManager, SigScanner);
+            GameFunctions = new GameFunctions(DataManager, SigScanner);
+            Common = new XivCommonBase(Hooks.Tooltips);
+            Common.Functions.Tooltips.OnItemTooltip += OnItemTooltip;
 
             statusWindow = new StatusWindow(configuration);
             configWindow = new ConfigWindow(configuration);
@@ -54,6 +62,8 @@ namespace BlindBoxPlugin
             windowSystem.RemoveAllWindows();
             PluginInterface.UiBuilder.Draw -= Draw;
             PluginInterface.UiBuilder.OpenConfigUi -= OpenConfigUi;
+            Common.Functions.Tooltips.OnItemTooltip -= OnItemTooltip;
+            Common.Dispose();
         }
 
         private void OnCommand(string command, string args)
@@ -87,7 +97,34 @@ namespace BlindBoxPlugin
             configWindow.IsOpen = true;
         }
 
-        //
+        private void OnItemTooltip(ItemTooltip tooltip, ulong itemId)
+        {
+            if (itemId > 1_000_000)
+            {
+                itemId -= 1_000_000;
+            }
+
+            // 特殊配给货箱（红莲）: 36636
+            // 特殊配给货箱（重生/苍穹）: 36635
+            if (itemId == 36635 || itemId == 36636)
+            {
+                var item = DataManager.GetExcelSheet<Item>()!.GetRow((uint)itemId);
+                if (item == null)
+                {
+                    return;
+                }
+
+                var description = tooltip[ItemTooltipString.Description];
+
+                var blindbox = itemId == 36635 ? BlindBoxData.MaterielContainer30 : BlindBoxData.MaterielContainer40;
+                var text = $"\n已获得：{blindbox.Intersect(configuration.AcquiredItems).Count()}/{blindbox.Count}";
+                description.Payloads.Add(new TextPayload(text));
+
+                tooltip[ItemTooltipString.Description] = description;
+            }
+
+        }
+
         private void UpdateAcquiredList()
         {
             List<string> minions = new();
@@ -102,11 +139,11 @@ namespace BlindBoxPlugin
                     continue;
                 }
                 var type = (ActionType)action.Type;
-                if (type == ActionType.Minions && gameFunctions.HasAcquired(item))
+                if (type == ActionType.Minions && GameFunctions.HasAcquired(item))
                 {
                     minions.Add(item.Name);
                 }
-                if (type == ActionType.Mounts && gameFunctions.HasAcquired(item))
+                if (type == ActionType.Mounts && GameFunctions.HasAcquired(item))
                 {
                     mounts.Add(item.Name);
                 }
