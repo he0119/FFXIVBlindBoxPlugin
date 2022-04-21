@@ -2,13 +2,15 @@ using Dalamud.Data;
 using Dalamud.Game;
 using Dalamud.Game.Command;
 using Dalamud.Game.Gui;
+using Dalamud.Game.Text.SeStringHandling.Payloads;
 using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
 using Dalamud.Plugin;
 using Lumina.Excel.GeneratedSheets;
-using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
+using System.Linq;
+using XivCommon;
+using XivCommon.Functions.Tooltips;
 
 namespace BlindBoxPlugin
 {
@@ -25,20 +27,20 @@ namespace BlindBoxPlugin
 
         private readonly Configuration configuration;
 
+        private readonly GameFunctions GameFunctions;
+        private readonly XivCommonBase Common;
+
         private readonly WindowSystem windowSystem = new("BlindBox");
         private readonly StatusWindow statusWindow;
         private readonly ConfigWindow configWindow;
-
-        private delegate byte HasItemActionUnlockedDelegate(IntPtr mem);
-        private readonly HasItemActionUnlockedDelegate _hasItemActionUnlocked;
-        private delegate byte HasCardDelegate(IntPtr localPlayer, ushort cardId);
-        private readonly HasCardDelegate _hasCard;
-        private readonly IntPtr _cardStaticAddr;
 
         public BlindBox()
         {
             configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
             configuration.Initialize(PluginInterface);
+            GameFunctions = new GameFunctions(DataManager, SigScanner);
+            Common = new XivCommonBase(Hooks.Tooltips);
+            Common.Functions.Tooltips.OnItemTooltip += OnItemTooltip;
 
             statusWindow = new StatusWindow(configuration);
             configWindow = new ConfigWindow(configuration);
@@ -52,18 +54,6 @@ namespace BlindBoxPlugin
 
             PluginInterface.UiBuilder.Draw += Draw;
             PluginInterface.UiBuilder.OpenConfigUi += OpenConfigUi;
-
-            var hasIaUnlockedPtr = SigScanner.ScanText("E8 ?? ?? ?? ?? 84 C0 75 A9");
-            var hasCardPtr = SigScanner.ScanText("40 53 48 83 EC 20 48 8B D9 66 85 D2 74");
-            _cardStaticAddr = SigScanner.GetStaticAddressFromSig("41 0F B7 17 48 8D 0D");
-
-            if (hasIaUnlockedPtr == IntPtr.Zero || hasCardPtr == IntPtr.Zero || _cardStaticAddr == IntPtr.Zero)
-            {
-                throw new ApplicationException("Could not get pointers for game functions");
-            }
-
-            _hasItemActionUnlocked = Marshal.GetDelegateForFunctionPointer<HasItemActionUnlockedDelegate>(hasIaUnlockedPtr);
-            _hasCard = Marshal.GetDelegateForFunctionPointer<HasCardDelegate>(hasCardPtr);
         }
 
         public void Dispose()
@@ -72,6 +62,8 @@ namespace BlindBoxPlugin
             windowSystem.RemoveAllWindows();
             PluginInterface.UiBuilder.Draw -= Draw;
             PluginInterface.UiBuilder.OpenConfigUi -= OpenConfigUi;
+            Common.Functions.Tooltips.OnItemTooltip -= OnItemTooltip;
+            Common.Dispose();
         }
 
         private void OnCommand(string command, string args)
@@ -105,7 +97,34 @@ namespace BlindBoxPlugin
             configWindow.IsOpen = true;
         }
 
-        // https://github.com/VergilGao/GoodMemoryCN/blob/master/GoodMemory/GameFunctions.cs
+        private void OnItemTooltip(ItemTooltip tooltip, ulong itemId)
+        {
+            if (itemId > 1_000_000)
+            {
+                itemId -= 1_000_000;
+            }
+
+            // 特殊配给货箱（红莲）: 36636
+            // 特殊配给货箱（重生/苍穹）: 36635
+            if (itemId == 36635 || itemId == 36636)
+            {
+                var item = DataManager.GetExcelSheet<Item>()!.GetRow((uint)itemId);
+                if (item == null)
+                {
+                    return;
+                }
+
+                var description = tooltip[ItemTooltipString.Description];
+
+                var blindbox = itemId == 36635 ? BlindBoxData.MaterielContainer30 : BlindBoxData.MaterielContainer40;
+                var text = $"\n已获得：{blindbox.Intersect(configuration.AcquiredItems).Count()}/{blindbox.Count}";
+                description.Payloads.Add(new TextPayload(text));
+
+                tooltip[ItemTooltipString.Description] = description;
+            }
+
+        }
+
         private void UpdateAcquiredList()
         {
             List<string> minions = new();
@@ -120,11 +139,11 @@ namespace BlindBoxPlugin
                     continue;
                 }
                 var type = (ActionType)action.Type;
-                if (type == ActionType.Minions && HasAcquired(item))
+                if (type == ActionType.Minions && GameFunctions.HasAcquired(item))
                 {
                     minions.Add(item.Name);
                 }
-                if (type == ActionType.Mounts && HasAcquired(item))
+                if (type == ActionType.Mounts && GameFunctions.HasAcquired(item))
                 {
                     mounts.Add(item.Name);
                 }
@@ -136,73 +155,6 @@ namespace BlindBoxPlugin
             configuration.Save();
 
             Chat.Print("盲盒数据更新成功！");
-        }
-
-        private enum ActionType : ushort
-        {
-            Minions = 853, // minions
-            Bardings = 1_013, // bardings
-            Mounts = 1_322, // mounts
-            CrafterBooks = 2_136, // crafter books
-            Miscellaneous = 2_633, // riding maps, blu totems, emotes/dances, hairstyles
-            Cards = 3_357, // cards
-            GathererBooks = 4_107, // gatherer books
-            OrchestrionRolls = 25_183, // orchestrion rolls
-                                       // these appear to be server-side
-                                       // FieldNotes = 19_743, // bozjan field notes
-            FashionAccessories = 20_086, // fashion accessories
-                                         // missing: 2_894 (always false)
-        }
-
-        private bool HasAcquired(Item item)
-        {
-            var action = item.ItemAction.Value;
-
-            if (action == null)
-            {
-                return false;
-            }
-
-            var type = (ActionType)action.Type;
-
-            if (type != ActionType.Cards)
-            {
-                return HasItemActionUnlocked(item);
-            }
-
-            var cardId = item.AdditionalData;
-            var card = DataManager.GetExcelSheet<TripleTriadCard>()!.GetRow(cardId);
-            return card != null && HasCard((ushort)card.RowId);
-        }
-
-        private unsafe bool HasItemActionUnlocked(Item item)
-        {
-            var itemAction = item.ItemAction.Value;
-            if (itemAction == null)
-            {
-                return false;
-            }
-
-            var type = (ActionType)itemAction.Type;
-
-            var mem = Marshal.AllocHGlobal(256);
-            *(uint*)(mem + 142) = itemAction.RowId;
-
-            if (type == ActionType.OrchestrionRolls)
-            {
-                *(uint*)(mem + 112) = item.AdditionalData;
-            }
-
-            var ret = this._hasItemActionUnlocked(mem) == 1;
-
-            Marshal.FreeHGlobal(mem);
-
-            return ret;
-        }
-
-        private bool HasCard(ushort cardId)
-        {
-            return _hasCard(_cardStaticAddr, cardId) == 1;
         }
     }
 }
