@@ -104,18 +104,18 @@ namespace BlindBoxPlugin
             {
                 itemId -= 1_000_000;
             }
-            PluginLog.Debug($"[BlindBox] OnItemTooltip: {itemId}");
+            var item = DataManager.GetExcelSheet<Item>()!.GetRow((uint)itemId);
+            if (item == null)
+            {
+                return;
+            }
+
+            PluginLog.Debug($"[BlindBox] OnItemTooltip: {item.Name}({itemId})");
 
             // 特殊配给货箱（红莲）: 36636
             // 特殊配给货箱（重生/苍穹）: 36635
             if (itemId == 36635 || itemId == 36636)
             {
-                var item = DataManager.GetExcelSheet<Item>()!.GetRow((uint)itemId);
-                if (item == null)
-                {
-                    return;
-                }
-
                 var description = tooltip[ItemTooltipString.Description];
 
                 var blindbox = itemId == 36635 ? BlindBoxData.MaterielContainer30 : BlindBoxData.MaterielContainer40;
