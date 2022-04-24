@@ -112,12 +112,11 @@ namespace BlindBoxPlugin
 
             PluginLog.Debug($"[BlindBox] OnItemTooltip: {item.Name}({itemId})");
 
-            if (itemId == 36635 || itemId == 36636)
+            if (BlindBoxData.BlindBoxInfoMap.TryGetValue(itemId, out var blindbox))
             {
                 var description = tooltip[ItemTooltipString.Description];
 
-                var blindbox = itemId == 36635 ? BlindBoxData.MaterielContainer30 : BlindBoxData.MaterielContainer40;
-                var text = $"\n已获得：{blindbox.Intersect(configuration.AcquiredItems()).Count()}/{blindbox.Count}";
+                var text = $"\n已获得：{blindbox.Items.Intersect(configuration.AcquiredItems()).Count()}/{blindbox.Items.Count}";
                 description.Payloads.Add(new TextPayload(text));
 
                 tooltip[ItemTooltipString.Description] = description;

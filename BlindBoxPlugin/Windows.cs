@@ -27,9 +27,6 @@ namespace BlindBoxPlugin
 
         public override void Draw()
         {
-            ImGui.Text($"特殊配给货箱（红莲）：{BlindBoxData.MaterielContainer40.Intersect(configuration.AcquiredItems()).Count()}/{BlindBoxData.MaterielContainer40.Count}");
-            ImGui.Text($"特殊配给货箱（重生/苍穹）：{BlindBoxData.MaterielContainer30.Intersect(configuration.AcquiredItems()).Count()}/{BlindBoxData.MaterielContainer30.Count}");
-
             var displayModes = Enum.GetNames<DisplayMode>();
             var displayModeIndex = (int)configuration.DisplayMode;
             if (ImGui.Combo("显示物品的种类", ref displayModeIndex, DisplayModeNames.Names(), displayModes.Length))
@@ -40,8 +37,11 @@ namespace BlindBoxPlugin
 
             if (ImGui.BeginTabBar("BlindBoxTabBar", ImGuiTabBarFlags.AutoSelectNewTabs))
             {
-                DrawBlindBoxItemTab("特殊配给货箱（红莲）", BlindBoxData.MaterielContainer40);
-                DrawBlindBoxItemTab("特殊配给货箱（重生/苍穹）", BlindBoxData.MaterielContainer30);
+                foreach (var item in BlindBoxData.BlindBoxInfoMap)
+                {
+                    var blindbox = item.Value;
+                    DrawBlindBoxItemTab(blindbox.ItemName, blindbox.Items);
+                }
 
                 ImGui.EndTabBar();
             }
