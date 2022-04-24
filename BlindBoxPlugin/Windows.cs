@@ -27,9 +27,6 @@ namespace BlindBoxPlugin
 
         public override void Draw()
         {
-            ImGui.Text($"特殊配给货箱（红莲）：{BlindBoxData.MaterielContainer40.Intersect(configuration.AcquiredItems).Count()}/{BlindBoxData.MaterielContainer40.Count}");
-            ImGui.Text($"特殊配给货箱（重生/苍穹）：{BlindBoxData.MaterielContainer30.Intersect(configuration.AcquiredItems).Count()}/{BlindBoxData.MaterielContainer30.Count}");
-
             var displayModes = Enum.GetNames<DisplayMode>();
             var displayModeIndex = (int)configuration.DisplayMode;
             if (ImGui.Combo("显示物品的种类", ref displayModeIndex, DisplayModeNames.Names(), displayModes.Length))
@@ -40,36 +37,39 @@ namespace BlindBoxPlugin
 
             if (ImGui.BeginTabBar("BlindBoxTabBar", ImGuiTabBarFlags.AutoSelectNewTabs))
             {
-                DrawBlindBoxItemTab("特殊配给货箱（红莲）", BlindBoxData.MaterielContainer40);
-                DrawBlindBoxItemTab("特殊配给货箱（重生/苍穹）", BlindBoxData.MaterielContainer30);
+                foreach (var item in BlindBoxData.BlindBoxInfoMap)
+                {
+                    var blindbox = item.Value;
+                    DrawBlindBoxTab(blindbox);
+                }
 
                 ImGui.EndTabBar();
             }
         }
 
-        private void DrawBlindBoxItemTab(string label, List<string> blindbox)
+        private void DrawBlindBoxTab(BlindBoxInfo blindBox)
         {
-            if (ImGui.BeginTabItem(label))
+            if (ImGui.BeginTabItem(blindBox.ItemName))
             {
                 ImGui.BeginChild("items", new Vector2(-1, -1), false);
                 switch (configuration.DisplayMode)
                 {
                     case DisplayMode.All:
-                        foreach (var item in blindbox)
+                        foreach (var item in blindBox.Items)
                         {
-                            ImGui.Text(item);
+                            DrawBlindBoxItem(item, blindBox.UniqueItems.Contains(item));
                         }
                         break;
                     case DisplayMode.Acquired:
-                        foreach (var item in blindbox.Intersect(configuration.AcquiredItems))
+                        foreach (var item in blindBox.Items.Intersect(configuration.AcquiredItems))
                         {
-                            ImGui.Text(item);
+                            DrawBlindBoxItem(item, blindBox.UniqueItems.Contains(item));
                         }
                         break;
                     case DisplayMode.Missing:
-                        foreach (var item in blindbox.Except(configuration.AcquiredItems))
+                        foreach (var item in blindBox.Items.Except(configuration.AcquiredItems))
                         {
-                            ImGui.Text(item);
+                            DrawBlindBoxItem(item, blindBox.UniqueItems.Contains(item));
                         }
                         break;
                     default:
@@ -79,6 +79,16 @@ namespace BlindBoxPlugin
                 ImGui.EndChild();
                 ImGui.EndTabItem();
             }
+        }
+
+        private void DrawBlindBoxItem(string name, bool unique)
+        {
+            if (unique)
+            {
+                ImGui.Text("*");
+                ImGui.SameLine();
+            }
+            ImGui.Text(name);
         }
     }
 
