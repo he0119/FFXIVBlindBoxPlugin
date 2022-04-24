@@ -27,8 +27,8 @@ namespace BlindBoxPlugin
 
         public override void Draw()
         {
-            ImGui.Text($"特殊配给货箱（红莲）：{BlindBoxData.MaterielContainer40.Intersect(configuration.AcquiredItems).Count()}/{BlindBoxData.MaterielContainer40.Count}");
-            ImGui.Text($"特殊配给货箱（重生/苍穹）：{BlindBoxData.MaterielContainer30.Intersect(configuration.AcquiredItems).Count()}/{BlindBoxData.MaterielContainer30.Count}");
+            ImGui.Text($"特殊配给货箱（红莲）：{BlindBoxData.MaterielContainer40.Intersect(configuration.AcquiredItems()).Count()}/{BlindBoxData.MaterielContainer40.Count}");
+            ImGui.Text($"特殊配给货箱（重生/苍穹）：{BlindBoxData.MaterielContainer30.Intersect(configuration.AcquiredItems()).Count()}/{BlindBoxData.MaterielContainer30.Count}");
 
             var displayModes = Enum.GetNames<DisplayMode>();
             var displayModeIndex = (int)configuration.DisplayMode;
@@ -61,13 +61,13 @@ namespace BlindBoxPlugin
                         }
                         break;
                     case DisplayMode.Acquired:
-                        foreach (var item in blindbox.Intersect(configuration.AcquiredItems))
+                        foreach (var item in blindbox.Intersect(configuration.AcquiredItems()))
                         {
                             ImGui.Text(item);
                         }
                         break;
                     case DisplayMode.Missing:
-                        foreach (var item in blindbox.Except(configuration.AcquiredItems))
+                        foreach (var item in blindbox.Except(configuration.AcquiredItems()))
                         {
                             ImGui.Text(item);
                         }

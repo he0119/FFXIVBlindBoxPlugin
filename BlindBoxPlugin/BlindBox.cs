@@ -5,6 +5,7 @@ using Dalamud.Game.Gui;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
 using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
+using Dalamud.Logging;
 using Dalamud.Plugin;
 using Lumina.Excel.GeneratedSheets;
 using System.Collections.Generic;
@@ -103,6 +104,7 @@ namespace BlindBoxPlugin
             {
                 itemId -= 1_000_000;
             }
+            PluginLog.Debug($"[BlindBox] OnItemTooltip: {itemId}");
 
             // 特殊配给货箱（红莲）: 36636
             // 特殊配给货箱（重生/苍穹）: 36635
@@ -117,7 +119,7 @@ namespace BlindBoxPlugin
                 var description = tooltip[ItemTooltipString.Description];
 
                 var blindbox = itemId == 36635 ? BlindBoxData.MaterielContainer30 : BlindBoxData.MaterielContainer40;
-                var text = $"\n已获得：{blindbox.Intersect(configuration.AcquiredItems).Count()}/{blindbox.Count}";
+                var text = $"\n已获得：{blindbox.Intersect(configuration.AcquiredItems()).Count()}/{blindbox.Count}";
                 description.Payloads.Add(new TextPayload(text));
 
                 tooltip[ItemTooltipString.Description] = description;
@@ -129,6 +131,7 @@ namespace BlindBoxPlugin
         {
             List<string> minions = new();
             List<string> mounts = new();
+            List<string> cards = new();
 
             var items = DataManager.GetExcelSheet<Item>()!;
             foreach (var item in items)
@@ -143,15 +146,20 @@ namespace BlindBoxPlugin
                 {
                     minions.Add(item.Name);
                 }
-                if (type == ActionType.Mounts && GameFunctions.HasAcquired(item))
+                else if (type == ActionType.Mounts && GameFunctions.HasAcquired(item))
                 {
                     mounts.Add(item.Name);
+                }
+                else if (type == ActionType.Cards && GameFunctions.HasAcquired(item))
+                {
+                    cards.Add(item.Name);
                 }
             }
 
             // 保存已有物品数据
             configuration.Minions = minions;
             configuration.Mounts = mounts;
+            configuration.Cards = cards;
             configuration.Save();
 
             Chat.Print("盲盒数据更新成功！");

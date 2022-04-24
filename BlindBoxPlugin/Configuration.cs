@@ -15,21 +15,26 @@ namespace BlindBoxPlugin
         // 显示盲盒物品模式
         public DisplayMode DisplayMode { get; set; } = DisplayMode.Missing;
 
-        // 已经拥有的宠物
+        /// <summary>
+        /// 已经拥有的宠物
+        /// </summary>
         public List<string> Minions = new();
-        // 已经拥有的坐骑
+        /// <summary>
+        /// 已经拥有的坐骑
+        /// </summary>
         public List<string> Mounts = new();
+        /// <summary>
+        /// 已经拥有的幻卡
+        /// </summary>
+        public List<string> Cards = new();
 
         // the below exist just to make saving less cumbersome
-        public List<string> AcquiredItems
+        public List<string> AcquiredItems()
         {
-            get
-            {
-                List<string> acquiredItems = new();
-                acquiredItems.AddRange(Minions);
-                acquiredItems.AddRange(Mounts);
-                return acquiredItems;
-            }
+            List<string> acquiredItems = new();
+            acquiredItems.AddRange(Minions);
+            acquiredItems.AddRange(Mounts);
+            return acquiredItems;
         }
 
         [NonSerialized]
