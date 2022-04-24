@@ -16,26 +16,9 @@ namespace BlindBoxPlugin
         public DisplayMode DisplayMode { get; set; } = DisplayMode.Missing;
 
         /// <summary>
-        /// 已经拥有的宠物
+        /// 已经拥有的物品
         /// </summary>
-        public List<string> Minions = new();
-        /// <summary>
-        /// 已经拥有的坐骑
-        /// </summary>
-        public List<string> Mounts = new();
-        /// <summary>
-        /// 已经拥有的幻卡
-        /// </summary>
-        public List<string> Cards = new();
-
-        // the below exist just to make saving less cumbersome
-        public List<string> AcquiredItems()
-        {
-            List<string> acquiredItems = new();
-            acquiredItems.AddRange(Minions);
-            acquiredItems.AddRange(Mounts);
-            return acquiredItems;
-        }
+        public List<string> AcquiredItems = new();
 
         [NonSerialized]
         private DalamudPluginInterface? pluginInterface;

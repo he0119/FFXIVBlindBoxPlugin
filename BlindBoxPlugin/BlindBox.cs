@@ -116,7 +116,7 @@ namespace BlindBoxPlugin
             {
                 var description = tooltip[ItemTooltipString.Description];
 
-                var text = $"\n已获得：{blindbox.Items.Intersect(configuration.AcquiredItems()).Count()}/{blindbox.Items.Count}";
+                var text = $"\n已获得：{blindbox.Items.Intersect(configuration.AcquiredItems).Count()}/{blindbox.Items.Count}";
                 description.Payloads.Add(new TextPayload(text));
 
                 tooltip[ItemTooltipString.Description] = description;
@@ -126,9 +126,7 @@ namespace BlindBoxPlugin
 
         private void UpdateAcquiredList()
         {
-            List<string> minions = new();
-            List<string> mounts = new();
-            List<string> cards = new();
+            List<string> acquiredItems = new();
 
             var items = DataManager.GetExcelSheet<Item>()!;
             foreach (var item in items)
@@ -141,22 +139,20 @@ namespace BlindBoxPlugin
                 var type = (ActionType)action.Type;
                 if (type == ActionType.Minions && GameFunctions.HasAcquired(item))
                 {
-                    minions.Add(item.Name);
+                    acquiredItems.Add(item.Name);
                 }
                 else if (type == ActionType.Mounts && GameFunctions.HasAcquired(item))
                 {
-                    mounts.Add(item.Name);
+                    acquiredItems.Add(item.Name);
                 }
                 else if (type == ActionType.Cards && GameFunctions.HasAcquired(item))
                 {
-                    cards.Add(item.Name);
+                    acquiredItems.Add(item.Name);
                 }
             }
 
             // 保存已有物品数据
-            configuration.Minions = minions;
-            configuration.Mounts = mounts;
-            configuration.Cards = cards;
+            configuration.AcquiredItems = acquiredItems;
             configuration.Save();
 
             Chat.Print("盲盒数据更新成功！");
