@@ -7,3 +7,4 @@
 ## Credits
 
 - [GoodMemory](https://github.com/VergilGao/GoodMemoryCN/blob/master/GoodMemory/GameFunctions.cs)
+- [最终幻想XIV中文维基](https://ff14.huijiwiki.com/wiki/%E9%A6%96%E9%A1%B5)

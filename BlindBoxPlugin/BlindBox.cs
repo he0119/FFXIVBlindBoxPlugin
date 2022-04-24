@@ -112,8 +112,6 @@ namespace BlindBoxPlugin
 
             PluginLog.Debug($"[BlindBox] OnItemTooltip: {item.Name}({itemId})");
 
-            // 特殊配给货箱（红莲）: 36636
-            // 特殊配给货箱（重生/苍穹）: 36635
             if (itemId == 36635 || itemId == 36636)
             {
                 var description = tooltip[ItemTooltipString.Description];
