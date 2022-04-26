@@ -1,7 +1,6 @@
 using Dalamud.Data;
 using Dalamud.Game;
 using Dalamud.Game.Command;
-using Dalamud.Game.Gui;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
 using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
@@ -23,10 +22,9 @@ namespace BlindBoxPlugin
         [PluginService] public static DalamudPluginInterface PluginInterface { get; private set; } = null!;
         [PluginService] public static CommandManager CommandManager { get; private set; } = null!;
         [PluginService] public static DataManager DataManager { get; private set; } = null!;
-        [PluginService] public static ChatGui Chat { get; private set; } = null!;
         [PluginService] public static SigScanner SigScanner { get; private set; } = null!;
 
-        private readonly Configuration configuration;
+        private readonly Configuration PluginConfig;
 
         private readonly GameFunctions GameFunctions;
         private readonly XivCommonBase Common;
@@ -37,14 +35,14 @@ namespace BlindBoxPlugin
 
         public BlindBox()
         {
-            configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
-            configuration.Initialize(PluginInterface);
+            PluginConfig = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
+            PluginConfig.Initialize(PluginInterface);
             GameFunctions = new GameFunctions(DataManager, SigScanner);
             Common = new XivCommonBase(Hooks.Tooltips);
             Common.Functions.Tooltips.OnItemTooltip += OnItemTooltip;
 
-            statusWindow = new StatusWindow(configuration);
-            configWindow = new ConfigWindow(configuration);
+            statusWindow = new StatusWindow(PluginConfig);
+            configWindow = new ConfigWindow(PluginConfig);
             windowSystem.AddWindow(statusWindow);
             windowSystem.AddWindow(configWindow);
 
@@ -81,7 +79,7 @@ namespace BlindBoxPlugin
             else
             {
                 statusWindow.IsOpen = true;
-                if (configuration.AutoUpdate)
+                if (PluginConfig.AutoUpdate)
                 {
                     UpdateAcquiredList();
                 }
@@ -116,7 +114,7 @@ namespace BlindBoxPlugin
             {
                 var description = tooltip[ItemTooltipString.Description];
 
-                var text = $"\n已获得：{blindbox.Items.Intersect(configuration.AcquiredItems).Count()}/{blindbox.Items.Count}";
+                var text = $"\n已获得：{blindbox.Items.Intersect(PluginConfig.AcquiredItems).Count()}/{blindbox.Items.Count}";
                 description.Payloads.Add(new TextPayload(text));
 
                 tooltip[ItemTooltipString.Description] = description;
@@ -152,10 +150,10 @@ namespace BlindBoxPlugin
             }
 
             // 保存已有物品数据
-            configuration.AcquiredItems = acquiredItems;
-            configuration.Save();
+            PluginConfig.AcquiredItems = acquiredItems;
+            PluginConfig.Save();
 
-            Chat.Print("盲盒数据更新成功！");
+            PluginLog.Log("盲盒数据更新成功！");
         }
     }
 }

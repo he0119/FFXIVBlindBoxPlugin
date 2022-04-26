@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using Dalamud.Interface.Windowing;
@@ -9,11 +8,11 @@ namespace BlindBoxPlugin
 {
     public class StatusWindow : Window, IDisposable
     {
-        private readonly Configuration configuration;
+        private readonly Configuration PluginConfig;
 
         public StatusWindow(Configuration configuration) : base("盲盒信息")
         {
-            this.configuration = configuration;
+            PluginConfig = configuration;
 
             // 默认为关闭
             IsOpen = false;
@@ -28,11 +27,11 @@ namespace BlindBoxPlugin
         public override void Draw()
         {
             var displayModes = Enum.GetNames<DisplayMode>();
-            var displayModeIndex = (int)configuration.DisplayMode;
+            var displayModeIndex = (int)PluginConfig.DisplayMode;
             if (ImGui.Combo("显示物品的种类", ref displayModeIndex, DisplayModeNames.Names(), displayModes.Length))
             {
-                configuration.DisplayMode = (DisplayMode)displayModeIndex;
-                configuration.Save();
+                PluginConfig.DisplayMode = (DisplayMode)displayModeIndex;
+                PluginConfig.Save();
             }
 
             if (ImGui.BeginTabBar("BlindBoxTabBar", ImGuiTabBarFlags.AutoSelectNewTabs))
@@ -52,7 +51,7 @@ namespace BlindBoxPlugin
             if (ImGui.BeginTabItem(blindBox.ItemName))
             {
                 ImGui.BeginChild("items", new Vector2(-1, -1), false);
-                switch (configuration.DisplayMode)
+                switch (PluginConfig.DisplayMode)
                 {
                     case DisplayMode.All:
                         foreach (var item in blindBox.Items)
@@ -61,13 +60,13 @@ namespace BlindBoxPlugin
                         }
                         break;
                     case DisplayMode.Acquired:
-                        foreach (var item in blindBox.Items.Intersect(configuration.AcquiredItems))
+                        foreach (var item in blindBox.Items.Intersect(PluginConfig.AcquiredItems))
                         {
                             DrawBlindBoxItem(item, blindBox.UniqueItems.Contains(item));
                         }
                         break;
                     case DisplayMode.Missing:
-                        foreach (var item in blindBox.Items.Except(configuration.AcquiredItems))
+                        foreach (var item in blindBox.Items.Except(PluginConfig.AcquiredItems))
                         {
                             DrawBlindBoxItem(item, blindBox.UniqueItems.Contains(item));
                         }
@@ -94,11 +93,11 @@ namespace BlindBoxPlugin
 
     public class ConfigWindow : Window, IDisposable
     {
-        private readonly Configuration configuration;
+        private readonly Configuration PluginConfig;
 
         public ConfigWindow(Configuration configuration) : base("盲盒设置")
         {
-            this.configuration = configuration;
+            PluginConfig = configuration;
 
             // 默认为关闭
             IsOpen = false;
@@ -113,12 +112,12 @@ namespace BlindBoxPlugin
         public override void Draw()
         {
             // can't ref a property, so use a local copy
-            var autoUpdate = configuration.AutoUpdate;
+            var autoUpdate = PluginConfig.AutoUpdate;
             if (ImGui.Checkbox("自动更新", ref autoUpdate))
             {
-                configuration.AutoUpdate = autoUpdate;
+                PluginConfig.AutoUpdate = autoUpdate;
                 // can save immediately on change, if you don't want to provide a "Save and Close" button
-                configuration.Save();
+                PluginConfig.Save();
             }
             if (ImGui.IsItemHovered())
             {
