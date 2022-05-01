@@ -26,8 +26,12 @@ jobs:
     - name: Download latest Dalamud build
       run: |
         curl -O https://goatcorp.github.io/dalamud-distrib/latest.zip
-        mkdir BlindBoxPlugin/Dalamud
-        unzip latest.zip -d ./BlindBoxPlugin/Dalamud
+        mkdir Dalamud
+        unzip latest.zip -d ./Dalamud
+    - name: Modify csproj
+      run: |
+        sed -i '27c <DalamudLibPath>..\\Dalamud</DalamudLibPath>' ./BlindBoxPlugin/BlindBoxPlugin.csproj
+        sed -i '/<OutputPath>/d' ./BlindBoxPlugin/BlindBoxPlugin.csproj
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
