@@ -108,7 +108,7 @@ namespace BlindBoxPlugin
                 return;
             }
 
-            PluginLog.Debug($"[BlindBox] OnItemTooltip: {item.Name}({itemId})");
+            PluginLog.Verbose($"[BlindBox] OnItemTooltip: {item.Name}({itemId})");
 
             if (BlindBoxData.BlindBoxInfoMap.TryGetValue(itemId, out var blindbox))
             {

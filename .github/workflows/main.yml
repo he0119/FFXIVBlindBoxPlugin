@@ -28,6 +28,11 @@ jobs:
         curl -O https://goatcorp.github.io/dalamud-distrib/latest.zip
         mkdir BlindBoxPlugin/Dalamud
         unzip latest.zip -d ./BlindBoxPlugin/Dalamud
+    - name: Modify csproj
+      run: |
+        sed -i '27c <DalamudLibPath>$(Project)Dalamud\\\\</DalamudLibPath>' ./BlindBoxPlugin/BlindBoxPlugin.csproj
+        sed -i '/<OutputPath>/d' ./BlindBoxPlugin/BlindBoxPlugin.csproj
+        cat ./BlindBoxPlugin/BlindBoxPlugin.csproj
     - name: Restore dependencies
       run: dotnet restore
     - name: Build

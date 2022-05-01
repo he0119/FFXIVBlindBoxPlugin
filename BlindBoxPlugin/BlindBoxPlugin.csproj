@@ -2,6 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Authors>he0119</Authors>
+    <Title>BlindBoxPlugin</Title>
     <Company></Company>
     <Version>1.2.0.2</Version>
     <Description>A blind box plugin.</Description>
@@ -19,10 +20,11 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <OutputPath>$(USERPROFILE)\Games\Tools\Dalamud\XIVLauncher\devPlugins\$(Title)\</OutputPath>
   </PropertyGroup>
 
   <PropertyGroup>
-    <DalamudLibPath>$(Project)Dalamud\</DalamudLibPath>
+    <DalamudLibPath>$(USERPROFILE)\Games\Tools\Dalamud\6.3.0.9\</DalamudLibPath>
   </PropertyGroup>
 
   <ItemGroup>
