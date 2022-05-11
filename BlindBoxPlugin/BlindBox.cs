@@ -24,14 +24,15 @@ namespace BlindBoxPlugin
         [PluginService] public static DataManager DataManager { get; private set; } = null!;
         [PluginService] public static SigScanner SigScanner { get; private set; } = null!;
 
-        private readonly Configuration PluginConfig;
+        public readonly Configuration PluginConfig;
 
         private readonly GameFunctions GameFunctions;
         private readonly XivCommonBase Common;
 
         private readonly WindowSystem windowSystem = new("BlindBox");
-        private readonly StatusWindow statusWindow;
-        private readonly ConfigWindow configWindow;
+        public readonly StatusWindow statusWindow;
+        public readonly ConfigWindow configWindow;
+        public readonly ConvertWindow convertWindow;
 
         public BlindBox()
         {
@@ -41,10 +42,12 @@ namespace BlindBoxPlugin
             Common = new XivCommonBase(Hooks.Tooltips);
             Common.Functions.Tooltips.OnItemTooltip += OnItemTooltip;
 
-            statusWindow = new StatusWindow(PluginConfig);
-            configWindow = new ConfigWindow(PluginConfig);
+            statusWindow = new StatusWindow(this);
+            configWindow = new ConfigWindow(this);
+            convertWindow = new ConvertWindow(this);
             windowSystem.AddWindow(statusWindow);
             windowSystem.AddWindow(configWindow);
+            windowSystem.AddWindow(convertWindow);
 
             CommandManager.AddHandler(commandName, new CommandInfo(OnCommand)
             {
