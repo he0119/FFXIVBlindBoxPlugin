@@ -31,7 +31,6 @@ jobs:
     - name: Modify csproj
       run: |
         sed -i '27c <DalamudLibPath>$(Project)Dalamud\\\\</DalamudLibPath>' ./BlindBoxPlugin/BlindBoxPlugin.csproj
-        sed -i '/<OutputPath>/d' ./BlindBoxPlugin/BlindBoxPlugin.csproj
         cat ./BlindBoxPlugin/BlindBoxPlugin.csproj
     - name: Restore dependencies
       run: dotnet restore
