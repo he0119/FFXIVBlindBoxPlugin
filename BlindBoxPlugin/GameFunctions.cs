@@ -16,8 +16,7 @@ namespace BlindBoxPlugin
 
         public static void Initialize()
         {
-            if (initialized)
-                return;
+            if (initialized) return;
             initialized = true;
 
             var hasIaUnlockedPtr = BlindBox.SigScanner.ScanText("E8 ?? ?? ?? ?? 84 C0 75 A9");
@@ -36,7 +35,7 @@ namespace BlindBoxPlugin
         // https://github.com/VergilGao/GoodMemoryCN/blob/master/GoodMemory/GameFunctions.cs
         public static bool HasAcquired(Item item)
         {
-            if (!initialized) throw new Exception("GameFunctions not initialized");
+            if (!initialized) throw new ApplicationException("GameFunctions not initialized");
 
             var action = item.ItemAction.Value;
 
