@@ -50,6 +50,8 @@ jobs:
     needs: build
     if: ${{ github.event_name == 'release' && github.event.action == 'published' }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
       - name: Download artifacts
         uses: actions/download-artifact@v2
       - name: Run generator
