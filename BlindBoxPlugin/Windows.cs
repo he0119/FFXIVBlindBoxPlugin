@@ -118,7 +118,7 @@ namespace BlindBoxPlugin
         public override void Draw()
         {
             // can't ref a property, so use a local copy
-            if (ImGui.Button("导出数据"))
+            if (ImGui.Button("转换数据"))
             {
                 Plugin.convertWindow.IsOpen = true;
             }

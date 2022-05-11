@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Lumina.Excel.GeneratedSheets;
 
 namespace BlindBoxPlugin
@@ -30,45 +31,17 @@ namespace BlindBoxPlugin
 
         private List<Item> GetItems(List<uint> ids)
         {
-            var items = new List<Item>();
-            foreach (var id in ids)
-            {
-                var item = GetItem(id);
-                items.Add(item);
-            }
-            return items;
+            return ids.Select(id => GetItem(id)).ToList();
         }
-
 
         public List<Item> AcquiredItems
         {
-            get
-            {
-                var acquiredItems = new List<Item>();
-                foreach (var item in Items)
-                {
-                    if (GameFunctions.HasAcquired(item))
-                    {
-                        acquiredItems.Add(item);
-                    }
-                }
-                return acquiredItems;
-            }
+            get => Items.Where(item => GameFunctions.HasAcquired(item)).ToList();
         }
+
         public List<Item> MissingItems
         {
-            get
-            {
-                var missingItems = new List<Item>();
-                foreach (var item in Items)
-                {
-                    if (!GameFunctions.HasAcquired(item))
-                    {
-                        missingItems.Add(item);
-                    }
-                }
-                return missingItems;
-            }
+            get => Items.Where(item => !GameFunctions.HasAcquired(item)).ToList();
         }
     }
 

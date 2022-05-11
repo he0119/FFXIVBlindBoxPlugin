@@ -7,7 +7,6 @@ using Dalamud.IoC;
 using Dalamud.Logging;
 using Dalamud.Plugin;
 using Lumina.Excel.GeneratedSheets;
-using System.Collections.Generic;
 using System.Linq;
 using XivCommon;
 using XivCommon.Functions.Tooltips;
