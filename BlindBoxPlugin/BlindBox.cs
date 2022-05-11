@@ -26,7 +26,6 @@ namespace BlindBoxPlugin
 
         public readonly Configuration PluginConfig;
 
-        private readonly GameFunctions GameFunctions;
         private readonly XivCommonBase Common;
 
         private readonly WindowSystem windowSystem = new("BlindBox");
@@ -38,7 +37,7 @@ namespace BlindBoxPlugin
         {
             PluginConfig = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
             PluginConfig.Initialize(PluginInterface);
-            GameFunctions = new GameFunctions(DataManager, SigScanner);
+            GameFunctions.Initialize();
             Common = new XivCommonBase(Hooks.Tooltips);
             Common.Functions.Tooltips.OnItemTooltip += OnItemTooltip;
 
@@ -71,21 +70,13 @@ namespace BlindBoxPlugin
         private void OnCommand(string command, string args)
         {
             // in response to the slash command, just display our main ui
-            if (args == "update")
-            {
-                UpdateAcquiredList();
-            }
-            else if (args == "config")
+            if (args == "config")
             {
                 configWindow.IsOpen = true;
             }
             else
             {
                 statusWindow.IsOpen = true;
-                if (PluginConfig.AutoUpdate)
-                {
-                    UpdateAcquiredList();
-                }
             }
         }
 
@@ -117,46 +108,12 @@ namespace BlindBoxPlugin
             {
                 var description = tooltip[ItemTooltipString.Description];
 
-                var text = $"\n已获得：{blindbox.Items.Intersect(PluginConfig.AcquiredItems).Count()}/{blindbox.Items.Count}";
+                var text = $"\n已获得：{blindbox.AcquiredItems.Count()}/{blindbox.Items.Count}";
                 description.Payloads.Add(new TextPayload(text));
 
                 tooltip[ItemTooltipString.Description] = description;
             }
 
-        }
-
-        private void UpdateAcquiredList()
-        {
-            List<string> acquiredItems = new();
-
-            var items = DataManager.GetExcelSheet<Item>()!;
-            foreach (var item in items)
-            {
-                var action = item.ItemAction.Value;
-                if (action == null)
-                {
-                    continue;
-                }
-                var type = (ActionType)action.Type;
-                if (type == ActionType.Minions && GameFunctions.HasAcquired(item))
-                {
-                    acquiredItems.Add(item.Name);
-                }
-                else if (type == ActionType.Mounts && GameFunctions.HasAcquired(item))
-                {
-                    acquiredItems.Add(item.Name);
-                }
-                else if (type == ActionType.Cards && GameFunctions.HasAcquired(item))
-                {
-                    acquiredItems.Add(item.Name);
-                }
-            }
-
-            // 保存已有物品数据
-            PluginConfig.AcquiredItems = acquiredItems;
-            PluginConfig.Save();
-
-            PluginLog.Log("盲盒数据更新成功！");
         }
     }
 }

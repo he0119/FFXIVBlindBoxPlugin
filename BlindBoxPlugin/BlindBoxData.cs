@@ -1,23 +1,74 @@
 using System.Collections.Generic;
+using Lumina.Excel.GeneratedSheets;
 
 namespace BlindBoxPlugin
 {
     public class BlindBoxInfo
     {
-        public ulong Item;
-        public List<uint> Items;
-        public List<uint> UniqueItems = new();
+        public Item Item;
+        public List<Item> Items;
+        public List<Item> UniqueItems = new();
 
-        public BlindBoxInfo(ulong item, List<uint> items)
+        public BlindBoxInfo(uint id, List<uint> itemIds)
         {
-            Item = item;
-            Items = items;
+            Item = GetItem(id);
+            Items = GetItems(itemIds);
         }
-        public BlindBoxInfo(ulong item, List<uint> items, List<uint> uniqueItems)
+        public BlindBoxInfo(uint id, List<uint> itemIds, List<uint> uniqueItemIds)
         {
-            Item = item;
-            Items = items;
-            UniqueItems = uniqueItems;
+            Item = GetItem(id);
+            Items = GetItems(itemIds);
+            UniqueItems = GetItems(uniqueItemIds);
+        }
+
+        private Item GetItem(uint id)
+        {
+            var item = BlindBox.DataManager.GetExcelSheet<Item>()?.GetRow(id);
+            if (item == null) return new Item();
+            return item;
+        }
+
+        private List<Item> GetItems(List<uint> ids)
+        {
+            var items = new List<Item>();
+            foreach (var id in ids)
+            {
+                var item = GetItem(id);
+                items.Add(item);
+            }
+            return items;
+        }
+
+
+        public List<Item> AcquiredItems
+        {
+            get
+            {
+                var acquiredItems = new List<Item>();
+                foreach (var item in Items)
+                {
+                    if (GameFunctions.HasAcquired(item))
+                    {
+                        acquiredItems.Add(item);
+                    }
+                }
+                return acquiredItems;
+            }
+        }
+        public List<Item> MissingItems
+        {
+            get
+            {
+                var missingItems = new List<Item>();
+                foreach (var item in Items)
+                {
+                    if (!GameFunctions.HasAcquired(item))
+                    {
+                        missingItems.Add(item);
+                    }
+                }
+                return missingItems;
+            }
         }
     }
 

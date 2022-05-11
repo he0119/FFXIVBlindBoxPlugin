@@ -10,15 +10,8 @@ namespace BlindBoxPlugin
     {
         public int Version { get; set; } = 0;
 
-        // 打开界面时自动更新获得物品信息
-        public bool AutoUpdate { get; set; } = true;
         // 显示盲盒物品模式
         public DisplayMode DisplayMode { get; set; } = DisplayMode.Missing;
-
-        /// <summary>
-        /// 已经拥有的物品
-        /// </summary>
-        public List<string> AcquiredItems = new();
 
         [NonSerialized]
         private DalamudPluginInterface? pluginInterface;

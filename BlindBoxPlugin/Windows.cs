@@ -50,7 +50,7 @@ namespace BlindBoxPlugin
 
         private void DrawBlindBoxTab(BlindBoxInfo blindBox)
         {
-            if (ImGui.BeginTabItem(blindBox.ItemName))
+            if (ImGui.BeginTabItem(blindBox.Item.Name))
             {
                 ImGui.BeginChild("items", new Vector2(-1, -1), false);
                 switch (Plugin.PluginConfig.DisplayMode)
@@ -58,19 +58,19 @@ namespace BlindBoxPlugin
                     case DisplayMode.All:
                         foreach (var item in blindBox.Items)
                         {
-                            DrawBlindBoxItem(item, blindBox.UniqueItems.Contains(item));
+                            DrawBlindBoxItem(item.Name, blindBox.UniqueItems.Contains(item));
                         }
                         break;
                     case DisplayMode.Acquired:
-                        foreach (var item in blindBox.Items.Intersect(Plugin.PluginConfig.AcquiredItems))
+                        foreach (var item in blindBox.AcquiredItems)
                         {
-                            DrawBlindBoxItem(item, blindBox.UniqueItems.Contains(item));
+                            DrawBlindBoxItem(item.Name, blindBox.UniqueItems.Contains(item));
                         }
                         break;
                     case DisplayMode.Missing:
-                        foreach (var item in blindBox.Items.Except(Plugin.PluginConfig.AcquiredItems))
+                        foreach (var item in blindBox.MissingItems)
                         {
-                            DrawBlindBoxItem(item, blindBox.UniqueItems.Contains(item));
+                            DrawBlindBoxItem(item.Name, blindBox.UniqueItems.Contains(item));
                         }
                         break;
                     default:
@@ -106,8 +106,8 @@ namespace BlindBoxPlugin
 
             SizeConstraints = new WindowSizeConstraints
             {
-                MinimumSize = new Vector2(230, 100),
-                MaximumSize = new Vector2(230, 100)
+                MinimumSize = new Vector2(230, 75),
+                MaximumSize = new Vector2(230, 75)
             };
             SizeCondition = ImGuiCond.Always;
             Flags = ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse;
@@ -118,18 +118,6 @@ namespace BlindBoxPlugin
         public override void Draw()
         {
             // can't ref a property, so use a local copy
-            var autoUpdate = Plugin.PluginConfig.AutoUpdate;
-            if (ImGui.Checkbox("自动更新", ref autoUpdate))
-            {
-                Plugin.PluginConfig.AutoUpdate = autoUpdate;
-                // can save immediately on change, if you don't want to provide a "Save and Close" button
-                Plugin.PluginConfig.Save();
-            }
-            if (ImGui.IsItemHovered())
-            {
-                ImGui.SetTooltip("是否在打开信息界面时自动更新盲盒数据。");
-            }
-
             if (ImGui.Button("导出数据"))
             {
                 Plugin.convertWindow.IsOpen = true;

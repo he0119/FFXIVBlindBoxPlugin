@@ -1,5 +1,3 @@
-using Dalamud.Data;
-using Dalamud.Game;
 using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Runtime.InteropServices;
@@ -8,36 +6,38 @@ namespace BlindBoxPlugin
 {
     public class GameFunctions
     {
-        private readonly DataManager _DataManager;
-        private readonly SigScanner _SigScanner;
+        private static bool initialized = false;
 
         private delegate byte HasItemActionUnlockedDelegate(IntPtr mem);
-        private readonly HasItemActionUnlockedDelegate _hasItemActionUnlocked;
+        private static HasItemActionUnlockedDelegate _hasItemActionUnlocked = null!;
         private delegate byte HasCardDelegate(IntPtr localPlayer, ushort cardId);
-        private readonly HasCardDelegate _hasCard;
-        private readonly IntPtr _cardStaticAddr;
+        private static HasCardDelegate _hasCard = null!;
+        private static IntPtr _cardStaticAddr;
 
-        public GameFunctions(DataManager dataManager, SigScanner sigScanner)
+        public static void Initialize()
         {
-            _DataManager = dataManager;
-            _SigScanner = sigScanner;
+            if (initialized)
+                return;
+            initialized = true;
 
-            var hasIaUnlockedPtr = _SigScanner.ScanText("E8 ?? ?? ?? ?? 84 C0 75 A9");
-            var hasCardPtr = _SigScanner.ScanText("40 53 48 83 EC 20 48 8B D9 66 85 D2 74");
-            this._cardStaticAddr = _SigScanner.GetStaticAddressFromSig("41 0F B7 17 48 8D 0D");
+            var hasIaUnlockedPtr = BlindBox.SigScanner.ScanText("E8 ?? ?? ?? ?? 84 C0 75 A9");
+            var hasCardPtr = BlindBox.SigScanner.ScanText("40 53 48 83 EC 20 48 8B D9 66 85 D2 74");
+            _cardStaticAddr = BlindBox.SigScanner.GetStaticAddressFromSig("41 0F B7 17 48 8D 0D");
 
-            if (hasIaUnlockedPtr == IntPtr.Zero || hasCardPtr == IntPtr.Zero || this._cardStaticAddr == IntPtr.Zero)
+            if (hasIaUnlockedPtr == IntPtr.Zero || hasCardPtr == IntPtr.Zero || _cardStaticAddr == IntPtr.Zero)
             {
                 throw new ApplicationException("Could not get pointers for game functions");
             }
 
-            this._hasItemActionUnlocked = Marshal.GetDelegateForFunctionPointer<HasItemActionUnlockedDelegate>(hasIaUnlockedPtr);
-            this._hasCard = Marshal.GetDelegateForFunctionPointer<HasCardDelegate>(hasCardPtr);
+            _hasItemActionUnlocked = Marshal.GetDelegateForFunctionPointer<HasItemActionUnlockedDelegate>(hasIaUnlockedPtr);
+            _hasCard = Marshal.GetDelegateForFunctionPointer<HasCardDelegate>(hasCardPtr);
         }
 
         // https://github.com/VergilGao/GoodMemoryCN/blob/master/GoodMemory/GameFunctions.cs
-        public bool HasAcquired(Item item)
+        public static bool HasAcquired(Item item)
         {
+            if (!initialized) throw new Exception("GameFunctions not initialized");
+
             var action = item.ItemAction.Value;
 
             if (action == null)
@@ -49,15 +49,15 @@ namespace BlindBoxPlugin
 
             if (type != ActionType.Cards)
             {
-                return this.HasItemActionUnlocked(item);
+                return HasItemActionUnlocked(item);
             }
 
             var cardId = item.AdditionalData;
-            var card = _DataManager.GetExcelSheet<TripleTriadCard>()!.GetRow(cardId);
-            return card != null && this.HasCard((ushort)card.RowId);
+            var card = BlindBox.DataManager.GetExcelSheet<TripleTriadCard>()!.GetRow(cardId);
+            return card != null && HasCard((ushort)card.RowId);
         }
 
-        private unsafe bool HasItemActionUnlocked(Item item)
+        private static unsafe bool HasItemActionUnlocked(Item item)
         {
             var itemAction = item.ItemAction.Value;
             if (itemAction == null)
@@ -75,16 +75,16 @@ namespace BlindBoxPlugin
                 *(uint*)(mem + 112) = item.AdditionalData;
             }
 
-            var ret = this._hasItemActionUnlocked(mem) == 1;
+            var ret = _hasItemActionUnlocked(mem) == 1;
 
             Marshal.FreeHGlobal(mem);
 
             return ret;
         }
 
-        private bool HasCard(ushort cardId)
+        private static bool HasCard(ushort cardId)
         {
-            return this._hasCard(this._cardStaticAddr, cardId) == 1;
+            return _hasCard(_cardStaticAddr, cardId) == 1;
         }
     }
 }
