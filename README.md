@@ -4,6 +4,12 @@
 
 ![image1.png](./images/image1.png)
 
+## 安装
+
+1. 卫月设置 -> 测试版
+2. 添加仓库 `https://raw.githubusercontent.com/he0119/FFXIVBlindBoxPlugin/main/repo.json` 并启用
+3. 从插件列表中安装
+
 ## Credits
 
 - [GoodMemory](https://github.com/VergilGao/GoodMemoryCN)
