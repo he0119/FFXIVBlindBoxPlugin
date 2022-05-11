@@ -12,7 +12,7 @@ $thisPath = Get-Location
 
 $table = ""
 
-$content = Get-Content "build/BlindBoxPlugin/BlindBoxPlugin.json" | ConvertFrom-Json
+$content = Get-Content "build/BlindBoxPlugin.json" | ConvertFrom-Json
 
 if ($notInclude.Contains($content.InternalName)) {
     $content | add-member -Name "IsHide" -value "True" -MemberType NoteProperty

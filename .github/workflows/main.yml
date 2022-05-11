@@ -7,6 +7,8 @@ on:
   pull_request:
     branches:
       - "main"
+  release:
+    types: [published]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -17,27 +19,51 @@ jobs:
     name: Build
     runs-on: windows-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 5.0.x
-    - name: Download latest Dalamud build
-      run: |
-        curl -O https://goatcorp.github.io/dalamud-distrib/latest.zip
-        mkdir BlindBoxPlugin/Dalamud
-        unzip latest.zip -d ./BlindBoxPlugin/Dalamud
-    - name: Modify csproj
-      run: |
-        sed -i '27c <DalamudLibPath>$(Project)Dalamud\\\\</DalamudLibPath>' ./BlindBoxPlugin/BlindBoxPlugin.csproj
-        cat ./BlindBoxPlugin/BlindBoxPlugin.csproj
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build -c Release -o build
-    - name: Upload Files
-      uses: actions/upload-artifact@v3
-      with:
-        name: BlindBoxPlugin
-        path: ${{ github.workspace }}/build/BlindBoxPlugin/
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
+      - name: Download latest Dalamud build
+        run: |
+          curl -O https://goatcorp.github.io/dalamud-distrib/latest.zip
+          mkdir BlindBoxPlugin/Dalamud
+          unzip latest.zip -d ./BlindBoxPlugin/Dalamud
+      - name: Modify csproj
+        run: |
+          sed -i '27c <DalamudLibPath>$(Project)Dalamud\\\\</DalamudLibPath>' ./BlindBoxPlugin/BlindBoxPlugin.csproj
+          cat ./BlindBoxPlugin/BlindBoxPlugin.csproj
+      - name: Restore dependencies
+        run: dotnet restore
+      - name: Build
+        run: dotnet build -c Release -o build
+      - name: Upload Files
+        uses: actions/upload-artifact@v3
+        with:
+          name: build
+          path: ${{ github.workspace }}/build/BlindBoxPlugin/
+
+  deploy:
+    name: Deploy
+    runs-on: windows-latest
+    needs: build
+    if: ${{ github.event_name == 'release' && github.event.action == 'published' }}
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+      - name: Run generator
+        run: .\.github\scripts\Make-Repo.ps1
+      - name: Commit and Push
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email github-actions[bot]@users.noreply.github.com
+          git add .
+          git diff-index --quiet HEAD || git commit -m "chore: Update repo"
+          git push
+      - name: Upload Release Assets
+        uses: alexellis/upload-assets@0.3.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          asset_paths: '["build/latest.zip"]'
