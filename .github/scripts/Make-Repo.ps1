@@ -4,8 +4,7 @@ $output = New-Object Collections.Generic.List[object]
 
 $content = Get-Content "build/BlindBoxPlugin.json" | ConvertFrom-Json
 
-$dlTemplateInstall = "https://github.com/he0119/FFXIVBlindBoxPlugin/releases/download/v{0}/latest.zip"
-$dlTemplateUpdate = "https://github.com/he0119/FFXIVBlindBoxPlugin/releases/download/v{0}/latest.zip"
+$dlTemplate = "https://github.com/he0119/FFXIVBlindBoxPlugin/releases/download/v{0}/latest.zip"
 
 $content | add-member -Name "IsHide" -value "False" -MemberType NoteProperty
 
@@ -18,11 +17,11 @@ $updateDate = Get-Date -UFormat %s
 $content | add-member -Name "LastUpdate" $updateDate -MemberType NoteProperty
 
 $assemblyVersion = $content.AssemblyVersion
-$installLink = $dlTemplateInstall -f $assemblyVersion
-$content | add-member -Name "DownloadLinkTesting" $installLink -MemberType NoteProperty
+$dlLink = $dlTemplate -f $assemblyVersion
 
-$updateLink = $dlTemplateUpdate -f $assemblyVersion
-$content | add-member -Name "DownloadLinkUpdate" $updateLink -MemberType NoteProperty
+$content | add-member -Name "DownloadLinkInstall" $dlLink -MemberType NoteProperty
+$content | add-member -Name "DownloadLinkTesting" $dlLink -MemberType NoteProperty
+$content | add-member -Name "DownloadLinkUpdate" $dlLink -MemberType NoteProperty
 
 $output.Add($content)
 
