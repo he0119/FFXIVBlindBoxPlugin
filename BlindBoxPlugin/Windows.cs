@@ -39,7 +39,8 @@ namespace BlindBoxPlugin
             }
 
             // 盲盒选择
-            if (ImGui.BeginChild("Selectors", new Vector2(200, 0), true))
+            var windowsWidth = ImGui.GetWindowWidth();
+            if (ImGui.BeginChild("Selectors", new Vector2(windowsWidth * 0.4f, -1), true))
             {
                 foreach (var item in BlindBoxData.BlindBoxInfoMap)
                 {
@@ -53,6 +54,7 @@ namespace BlindBoxPlugin
                 ImGui.EndChild();
             }
             ImGui.SameLine();
+            // 盲盒内容
             if (ImGui.BeginChild("Contents", new Vector2(-1, -1), true))
             {
                 if (BlindBoxData.BlindBoxInfoMap.TryGetValue(Plugin.PluginConfig.SelectedItem, out var blindBox))
