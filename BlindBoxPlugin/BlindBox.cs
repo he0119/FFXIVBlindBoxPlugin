@@ -30,7 +30,6 @@ namespace BlindBoxPlugin
         private readonly WindowSystem windowSystem = new("BlindBox");
         public readonly StatusWindow statusWindow;
         public readonly ConfigWindow configWindow;
-        public readonly ConvertWindow convertWindow;
 
         public BlindBox()
         {
@@ -42,10 +41,8 @@ namespace BlindBoxPlugin
 
             statusWindow = new StatusWindow(this);
             configWindow = new ConfigWindow(this);
-            convertWindow = new ConvertWindow(this);
             windowSystem.AddWindow(statusWindow);
             windowSystem.AddWindow(configWindow);
-            windowSystem.AddWindow(convertWindow);
 
             CommandManager.AddHandler(commandName, new CommandInfo(OnCommand)
             {

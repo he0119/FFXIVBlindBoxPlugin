@@ -19,7 +19,7 @@ namespace BlindBoxPlugin
             // 默认为关闭
             IsOpen = false;
 
-            SizeConstraints = new WindowSizeConstraints { MinimumSize = new Vector2(600, 400), MaximumSize = new Vector2(float.MaxValue, float.MaxValue) };
+            SizeConstraints = new WindowSizeConstraints { MinimumSize = new Vector2(500, 300), MaximumSize = new Vector2(float.MaxValue, float.MaxValue) };
             SizeCondition = ImGuiCond.FirstUseEver;
             Flags = ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse;
         }
@@ -28,60 +28,66 @@ namespace BlindBoxPlugin
 
         public override void Draw()
         {
+            // 选择盲盒显示内容
             var displayModes = Enum.GetNames<DisplayMode>();
             var displayModeIndex = (int)Plugin.PluginConfig.DisplayMode;
+            ImGui.SetNextItemWidth(100);
             if (ImGui.Combo("显示物品的种类", ref displayModeIndex, DisplayModeNames.Names(), displayModes.Length))
             {
                 Plugin.PluginConfig.DisplayMode = (DisplayMode)displayModeIndex;
                 Plugin.PluginConfig.Save();
             }
 
-            if (ImGui.BeginTabBar("BlindBoxTabBar", ImGuiTabBarFlags.AutoSelectNewTabs))
+            // 盲盒选择
+            if (ImGui.BeginChild("Selectors", new Vector2(200, 0), true))
             {
                 foreach (var item in BlindBoxData.BlindBoxInfoMap)
                 {
                     var blindbox = item.Value;
-                    DrawBlindBoxTab(blindbox);
-                }
-
-                ImGui.EndTabBar();
-            }
-        }
-
-        private void DrawBlindBoxTab(BlindBoxInfo blindBox)
-        {
-            if (ImGui.BeginTabItem(blindBox.Item.Name))
-            {
-                ImGui.BeginChild("items", new Vector2(-1, -1), false);
-                switch (Plugin.PluginConfig.DisplayMode)
-                {
-                    case DisplayMode.All:
-                        foreach (var item in blindBox.Items)
-                        {
-                            DrawBlindBoxItem(item.Name, blindBox.UniqueItems.Contains(item));
-                        }
-                        break;
-                    case DisplayMode.Acquired:
-                        foreach (var item in blindBox.AcquiredItems)
-                        {
-                            DrawBlindBoxItem(item.Name, blindBox.UniqueItems.Contains(item));
-                        }
-                        break;
-                    case DisplayMode.Missing:
-                        foreach (var item in blindBox.MissingItems)
-                        {
-                            DrawBlindBoxItem(item.Name, blindBox.UniqueItems.Contains(item));
-                        }
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-
+                    if (ImGui.Selectable(blindbox.Item.Name, blindbox.Item.RowId == Plugin.PluginConfig.SelectedItem))
+                    {
+                        Plugin.PluginConfig.SelectedItem = blindbox.Item.RowId;
+                        Plugin.PluginConfig.Save();
+                    }
                 }
                 ImGui.EndChild();
-                ImGui.EndTabItem();
+            }
+            ImGui.SameLine();
+            if (ImGui.BeginChild("Contents", new Vector2(-1, -1), true))
+            {
+                if (BlindBoxData.BlindBoxInfoMap.TryGetValue(Plugin.PluginConfig.SelectedItem, out var blindBox))
+                {
+                    switch (Plugin.PluginConfig.DisplayMode)
+                    {
+                        case DisplayMode.All:
+                            foreach (var item in blindBox.Items)
+                            {
+                                DrawBlindBoxItem(item.Name, blindBox.UniqueItems.Contains(item));
+                            }
+                            break;
+                        case DisplayMode.Acquired:
+                            foreach (var item in blindBox.AcquiredItems)
+                            {
+                                DrawBlindBoxItem(item.Name, blindBox.UniqueItems.Contains(item));
+                            }
+                            break;
+                        case DisplayMode.Missing:
+                            foreach (var item in blindBox.MissingItems)
+                            {
+                                DrawBlindBoxItem(item.Name, blindBox.UniqueItems.Contains(item));
+                            }
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                }
+                else
+                {
+                    ImGui.Text("请选择一个盲盒");
+                }
+                ImGui.EndChild();
             }
         }
-
         private void DrawBlindBoxItem(string name, bool unique)
         {
             if (unique)
@@ -96,6 +102,8 @@ namespace BlindBoxPlugin
     public class ConfigWindow : Window, IDisposable
     {
         private readonly BlindBox Plugin;
+        private string _text = "";
+        private List<String> _result = new List<string>();
 
         public ConfigWindow(BlindBox plugin) : base("盲盒设置")
         {
@@ -106,40 +114,7 @@ namespace BlindBoxPlugin
 
             SizeConstraints = new WindowSizeConstraints
             {
-                MinimumSize = new Vector2(230, 75),
-                MaximumSize = new Vector2(230, 75)
-            };
-            SizeCondition = ImGuiCond.Always;
-            Flags = ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse;
-        }
-
-        public void Dispose() { }
-
-        public override void Draw()
-        {
-            // can't ref a property, so use a local copy
-            if (ImGui.Button("转换数据"))
-            {
-                Plugin.convertWindow.IsOpen = true;
-            }
-        }
-    }
-
-    public class ConvertWindow : Window, IDisposable
-    {
-        private readonly BlindBox Plugin;
-        private string _text = "";
-
-        public ConvertWindow(BlindBox plugin) : base("转换数据")
-        {
-            Plugin = plugin;
-
-            // 默认为关闭
-            IsOpen = false;
-
-            SizeConstraints = new WindowSizeConstraints
-            {
-                MinimumSize = new Vector2(600, 400),
+                MinimumSize = new Vector2(480, 270),
                 MaximumSize = new Vector2(float.MaxValue, float.MaxValue)
             };
             SizeCondition = ImGuiCond.Always;
@@ -150,26 +125,54 @@ namespace BlindBoxPlugin
 
         public override void Draw()
         {
-            var text = _text;
-            if (ImGui.InputTextMultiline("##text", ref text, 10000, new Vector2(0, 0)))
+            if (ImGui.BeginTabBar("BlindBoxTabBar", ImGuiTabBarFlags.AutoSelectNewTabs))
             {
-                _text = text;
-            }
-
-            if (ImGui.Button("转换"))
-            {
-                var items = _text.Split('\n');
-                List<String> itemIds = new();
-
-                foreach (var item in items)
+                if (ImGui.BeginTabItem("数据转换"))
                 {
-                    var i = BlindBox.DataManager.GetExcelSheet<Item>()?.Where(i => i.Name == item).FirstOrDefault();
-                    if (i != null)
+                    var windowsWidth = ImGui.GetWindowWidth();
+                    var text = _text;
+                    ImGui.SetNextItemWidth(windowsWidth * 0.5f - 22);
+                    if (ImGui.InputTextMultiline("##text", ref text, ushort.MaxValue, new Vector2(0, 0)))
                     {
-                        itemIds.Add(i.RowId.ToString());
+                        _text = text;
                     }
+                    ImGui.SameLine();
+                    ImGui.Text("=>");
+                    ImGui.SameLine();
+                    ImGui.SetNextItemWidth(windowsWidth * 0.5f - 22);
+                    var result = String.Join("\n", _result);
+                    ImGui.InputTextMultiline("##result", ref result, ushort.MaxValue, new Vector2(0, 0), ImGuiInputTextFlags.ReadOnly);
+
+                    if (ImGui.Button("转换"))
+                    {
+                        var items = _text.Split('\n');
+                        List<String> itemIds = new();
+
+                        foreach (var item in items)
+                        {
+                            var i = BlindBox.DataManager.GetExcelSheet<Item>()?.Where(i => i.Name == item).FirstOrDefault();
+                            if (i != null)
+                            {
+                                itemIds.Add(i.RowId.ToString());
+                            }
+                            else
+                            {
+                                itemIds.Add("名称有误");
+                            }
+                        }
+                        _result = itemIds;
+                        // ImGui.SetClipboardText(String.Join(",", itemIds));
+                    }
+                    ImGui.SameLine();
+                    if (ImGui.Button("输出到剪贴板"))
+                    {
+                        ImGui.SetClipboardText(String.Join(",", _result));
+                    }
+
+                    ImGui.EndTabItem();
                 }
-                ImGui.SetClipboardText(String.Join(",", itemIds));
+
+                ImGui.EndTabBar();
             }
         }
     }
