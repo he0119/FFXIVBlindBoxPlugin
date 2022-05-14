@@ -19,7 +19,7 @@ namespace BlindBoxPlugin
             // 默认为关闭
             IsOpen = false;
 
-            SizeConstraints = new WindowSizeConstraints { MinimumSize = new Vector2(600, 400), MaximumSize = new Vector2(float.MaxValue, float.MaxValue) };
+            SizeConstraints = new WindowSizeConstraints { MinimumSize = new Vector2(500, 300), MaximumSize = new Vector2(float.MaxValue, float.MaxValue) };
             SizeCondition = ImGuiCond.FirstUseEver;
             Flags = ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse;
         }
@@ -28,60 +28,66 @@ namespace BlindBoxPlugin
 
         public override void Draw()
         {
+            // 选择盲盒显示内容
             var displayModes = Enum.GetNames<DisplayMode>();
             var displayModeIndex = (int)Plugin.PluginConfig.DisplayMode;
+            ImGui.SetNextItemWidth(100);
             if (ImGui.Combo("显示物品的种类", ref displayModeIndex, DisplayModeNames.Names(), displayModes.Length))
             {
                 Plugin.PluginConfig.DisplayMode = (DisplayMode)displayModeIndex;
                 Plugin.PluginConfig.Save();
             }
 
-            if (ImGui.BeginTabBar("BlindBoxTabBar", ImGuiTabBarFlags.AutoSelectNewTabs))
+            // 盲盒选择
+            if (ImGui.BeginChild("Selectors", new Vector2(200, 0), true))
             {
                 foreach (var item in BlindBoxData.BlindBoxInfoMap)
                 {
                     var blindbox = item.Value;
-                    DrawBlindBoxTab(blindbox);
-                }
-
-                ImGui.EndTabBar();
-            }
-        }
-
-        private void DrawBlindBoxTab(BlindBoxInfo blindBox)
-        {
-            if (ImGui.BeginTabItem(blindBox.Item.Name))
-            {
-                ImGui.BeginChild("items", new Vector2(-1, -1), false);
-                switch (Plugin.PluginConfig.DisplayMode)
-                {
-                    case DisplayMode.All:
-                        foreach (var item in blindBox.Items)
-                        {
-                            DrawBlindBoxItem(item.Name, blindBox.UniqueItems.Contains(item));
-                        }
-                        break;
-                    case DisplayMode.Acquired:
-                        foreach (var item in blindBox.AcquiredItems)
-                        {
-                            DrawBlindBoxItem(item.Name, blindBox.UniqueItems.Contains(item));
-                        }
-                        break;
-                    case DisplayMode.Missing:
-                        foreach (var item in blindBox.MissingItems)
-                        {
-                            DrawBlindBoxItem(item.Name, blindBox.UniqueItems.Contains(item));
-                        }
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-
+                    if (ImGui.Selectable(blindbox.Item.Name, blindbox.Item.RowId == Plugin.PluginConfig.SelectedItem))
+                    {
+                        Plugin.PluginConfig.SelectedItem = blindbox.Item.RowId;
+                        Plugin.PluginConfig.Save();
+                    }
                 }
                 ImGui.EndChild();
-                ImGui.EndTabItem();
+            }
+            ImGui.SameLine();
+            if (ImGui.BeginChild("Contents", new Vector2(-1, -1), true))
+            {
+                if (BlindBoxData.BlindBoxInfoMap.TryGetValue(Plugin.PluginConfig.SelectedItem, out var blindBox))
+                {
+                    switch (Plugin.PluginConfig.DisplayMode)
+                    {
+                        case DisplayMode.All:
+                            foreach (var item in blindBox.Items)
+                            {
+                                DrawBlindBoxItem(item.Name, blindBox.UniqueItems.Contains(item));
+                            }
+                            break;
+                        case DisplayMode.Acquired:
+                            foreach (var item in blindBox.AcquiredItems)
+                            {
+                                DrawBlindBoxItem(item.Name, blindBox.UniqueItems.Contains(item));
+                            }
+                            break;
+                        case DisplayMode.Missing:
+                            foreach (var item in blindBox.MissingItems)
+                            {
+                                DrawBlindBoxItem(item.Name, blindBox.UniqueItems.Contains(item));
+                            }
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                }
+                else
+                {
+                    ImGui.Text("请选择一个盲盒");
+                }
+                ImGui.EndChild();
             }
         }
-
         private void DrawBlindBoxItem(string name, bool unique)
         {
             if (unique)
