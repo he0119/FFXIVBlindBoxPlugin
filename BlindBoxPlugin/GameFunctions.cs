@@ -32,7 +32,7 @@ namespace BlindBoxPlugin
             _hasCard = Marshal.GetDelegateForFunctionPointer<HasCardDelegate>(hasCardPtr);
         }
 
-        // https://github.com/VergilGao/GoodMemoryCN/blob/master/GoodMemory/GameFunctions.cs
+        // https://git.annaclemens.io/ascclemens/GoodMemory/src/branch/main/GoodMemory/GameFunctions.cs
         public static bool HasAcquired(Item item)
         {
             if (!initialized) throw new ApplicationException("GameFunctions not initialized");
