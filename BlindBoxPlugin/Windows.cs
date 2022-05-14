@@ -31,7 +31,7 @@ namespace BlindBoxPlugin
             // 选择盲盒显示内容
             var displayModes = Enum.GetNames<DisplayMode>();
             var displayModeIndex = (int)Plugin.PluginConfig.DisplayMode;
-            ImGui.SetNextItemWidth(100);
+            ImGui.SetNextItemWidth(80);
             if (ImGui.Combo("显示物品的种类", ref displayModeIndex, DisplayModeNames.Names(), displayModes.Length))
             {
                 Plugin.PluginConfig.DisplayMode = (DisplayMode)displayModeIndex;
