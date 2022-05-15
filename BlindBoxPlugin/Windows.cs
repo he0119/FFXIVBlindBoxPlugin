@@ -29,10 +29,10 @@ namespace BlindBoxPlugin
         public override void Draw()
         {
             // 选择盲盒显示内容
-            var displayModes = Enum.GetNames<DisplayMode>();
+            var displayModeNames = Enum.GetValues<DisplayMode>().Select(x => x.Names()).ToArray();
             var displayModeIndex = (int)Plugin.PluginConfig.DisplayMode;
             ImGui.SetNextItemWidth(80);
-            if (ImGui.Combo("显示物品的种类", ref displayModeIndex, DisplayModeNames.Names(), displayModes.Length))
+            if (ImGui.Combo("显示物品的种类", ref displayModeIndex, displayModeNames, displayModeNames.Length))
             {
                 Plugin.PluginConfig.DisplayMode = (DisplayMode)displayModeIndex;
                 Plugin.PluginConfig.Save();

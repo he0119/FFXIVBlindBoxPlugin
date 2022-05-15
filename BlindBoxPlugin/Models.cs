@@ -22,16 +22,21 @@ namespace BlindBoxPlugin
         Missing
     }
 
-    public class DisplayModeNames
+    public static class DisplayModeExtensions
     {
-        public static string[] Names()
+        public static string Names(this DisplayMode displayMode)
         {
-            return new[]
+            switch (displayMode)
             {
-                "所有",
-                "已获得",
-                "未获得"
-            };
+                case DisplayMode.All:
+                    return "所有";
+                case DisplayMode.Acquired:
+                    return "已获得";
+                case DisplayMode.Missing:
+                    return "未获得";
+                default:
+                    return "未知";
+            }
         }
     }
 }
