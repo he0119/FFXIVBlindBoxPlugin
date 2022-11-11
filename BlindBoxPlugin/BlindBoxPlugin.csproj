@@ -20,11 +20,11 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <OutputPath>$(USERPROFILE)\Games\Tools\Dalamud\XIVLauncher\devPlugins\$(Title)\</OutputPath>
+    <OutputPath>$(USERPROFILE)\Games\Tools\XIVLauncherCN\Roaming\devPlugins\$(Title)\</OutputPath>
   </PropertyGroup>
 
   <PropertyGroup>
-    <DalamudLibPath>$(USERPROFILE)\Games\Tools\Dalamud\6.3.0.9\</DalamudLibPath>
+      <DalamudLibPath>$(USERPROFILE)\Games\Tools\XIVLauncherCN\Roaming\addon\Hooks\dev\</DalamudLibPath>
   </PropertyGroup>
 
   <ItemGroup>
