@@ -10,7 +10,7 @@
     "https://raw.githubusercontent.com/he0119/FFXIVBlindBoxPlugin/main/images/image1.png"
   ],
   "ApplicableVersion": "any",
-  "DalamudApiLevel": 6,
+  "DalamudApiLevel": 7,
   "LoadPriority": 0,
   "Tags": [
     "blindbox"
