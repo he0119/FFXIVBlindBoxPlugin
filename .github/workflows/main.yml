@@ -61,9 +61,9 @@ jobs:
           git add .
           git diff-index --quiet HEAD || git commit -m "chore: Update repo"
           git push
+      - name: Set Tag Name
+        run: echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
       - name: Upload Release Assets
-        uses: alexellis/upload-assets@0.3.0
+        run: gh release upload --clobber ${{ env.TAG_NAME }} build/latest.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          asset_paths: '["build/latest.zip"]'
