@@ -20,7 +20,6 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <OutputPath>$(USERPROFILE)\Games\Tools\XIVLauncherCN\Roaming\devPlugins\$(Title)\</OutputPath>
   </PropertyGroup>
 
   <PropertyGroup>
