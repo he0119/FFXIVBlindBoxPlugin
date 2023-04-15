@@ -32,7 +32,7 @@ jobs:
           unzip latest.zip -d ./BlindBoxPlugin/Dalamud
       - name: Modify csproj
         run: |
-          sed -i '27c <DalamudLibPath>$(Project)Dalamud\\\\</DalamudLibPath>' ./BlindBoxPlugin/BlindBoxPlugin.csproj
+          sed -i 's/<DalamudLibPath>.\+<\/DalamudLibPath>/<DalamudLibPath>$(Project)Dalamud\\<\/DalamudLibPath>/g' ./BlindBoxPlugin/BlindBoxPlugin.csproj
           cat ./BlindBoxPlugin/BlindBoxPlugin.csproj
       - name: Restore dependencies
         run: dotnet restore
