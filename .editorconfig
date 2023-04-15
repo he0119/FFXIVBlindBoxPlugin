@@ -17,5 +17,8 @@ indent_size = 2
 [*.yml]
 indent_size = 2
 
+[*.csproj]
+indent_size = 2
+
 [*.md]
 trim_trailing_whitespace = false

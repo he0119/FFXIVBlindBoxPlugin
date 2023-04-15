@@ -23,7 +23,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-      <DalamudLibPath>$(USERPROFILE)\Games\Tools\XIVLauncherCN\Roaming\addon\Hooks\dev\</DalamudLibPath>
+    <DalamudLibPath Condition=" '$(DalamudLibPath)' == '' ">$(USERPROFILE)\Games\Tools\XIVLauncherCN\Roaming\addon\Hooks\dev\</DalamudLibPath>
   </PropertyGroup>
 
   <ItemGroup>

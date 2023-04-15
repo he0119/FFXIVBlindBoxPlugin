@@ -30,14 +30,10 @@ jobs:
           curl -O https://goatcorp.github.io/dalamud-distrib/latest.zip
           mkdir BlindBoxPlugin/Dalamud
           unzip latest.zip -d ./BlindBoxPlugin/Dalamud
-      - name: Modify csproj
-        run: |
-          sed -i 's/<DalamudLibPath>.\+<\/DalamudLibPath>/<DalamudLibPath>$(Project)Dalamud\\<\/DalamudLibPath>/g' ./BlindBoxPlugin/BlindBoxPlugin.csproj
-          cat ./BlindBoxPlugin/BlindBoxPlugin.csproj
-      - name: Restore dependencies
-        run: dotnet restore
       - name: Build
         run: dotnet build -c Release -o build
+        env:
+          DalamudLibPath: ${{ github.workspace }}/Dalamud/
       - name: Upload Files
         uses: actions/upload-artifact@v3
         with:
