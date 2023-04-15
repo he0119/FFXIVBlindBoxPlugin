@@ -31,7 +31,7 @@ jobs:
           mkdir BlindBoxPlugin/Dalamud
           unzip latest.zip -d ./BlindBoxPlugin/Dalamud
       - name: Build
-        run: dotnet build -c Release -o build
+        run: dotnet build BlindBoxPlugin -c Release -o build
         env:
           DalamudLibPath: ${{ github.workspace }}/Dalamud/
       - name: Upload Files
