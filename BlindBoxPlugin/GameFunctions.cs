@@ -1,3 +1,6 @@
+// 物品获取信息
+// https://github.com/VergilGao/GoodMemoryCN/blob/master/GoodMemory/GameFunctions.cs
+
 using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Runtime.InteropServices;
@@ -37,7 +40,6 @@ namespace BlindBoxPlugin
             _itemToUlong = Marshal.GetDelegateForFunctionPointer<ItemToUlongDelegate>(itemToUlongPtr);
         }
 
-        // https://git.annaclemens.io/ascclemens/GoodMemory/src/branch/main/GoodMemory/GameFunctions.cs
         public static bool HasAcquired(Item item)
         {
             if (!initialized) throw new ApplicationException("GameFunctions not initialized");
