@@ -1,15 +1,9 @@
 using Dalamud.Data;
 using Dalamud.Game;
 using Dalamud.Game.Command;
-using Dalamud.Game.Text.SeStringHandling.Payloads;
 using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
-using Dalamud.Logging;
 using Dalamud.Plugin;
-using Lumina.Excel.GeneratedSheets;
-using System.Linq;
-using XivCommon;
-using XivCommon.Functions.Tooltips;
 
 namespace BlindBoxPlugin
 {
@@ -25,8 +19,6 @@ namespace BlindBoxPlugin
 
         public readonly Configuration PluginConfig;
 
-        private readonly XivCommonBase Common;
-
         private readonly WindowSystem windowSystem = new("BlindBox");
         public readonly StatusWindow statusWindow;
         public readonly ConfigWindow configWindow;
@@ -35,9 +27,6 @@ namespace BlindBoxPlugin
         {
             PluginConfig = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
             PluginConfig.Initialize(PluginInterface);
-            GameFunctions.Initialize();
-            Common = new XivCommonBase(Hooks.Tooltips);
-            Common.Functions.Tooltips.OnItemTooltip += OnItemTooltip;
 
             statusWindow = new StatusWindow(this);
             configWindow = new ConfigWindow(this);
@@ -59,8 +48,6 @@ namespace BlindBoxPlugin
             windowSystem.RemoveAllWindows();
             PluginInterface.UiBuilder.Draw -= Draw;
             PluginInterface.UiBuilder.OpenConfigUi -= OpenConfigUi;
-            Common.Functions.Tooltips.OnItemTooltip -= OnItemTooltip;
-            Common.Dispose();
         }
 
         private void OnCommand(string command, string args)
@@ -84,32 +71,6 @@ namespace BlindBoxPlugin
         private void OpenConfigUi()
         {
             configWindow.IsOpen = true;
-        }
-
-        private void OnItemTooltip(ItemTooltip tooltip, ulong itemId)
-        {
-            if (itemId > 1_000_000)
-            {
-                itemId -= 1_000_000;
-            }
-            var item = DataManager.GetExcelSheet<Item>()!.GetRow((uint)itemId);
-            if (item == null)
-            {
-                return;
-            }
-
-            PluginLog.Verbose($"[BlindBox] OnItemTooltip: {item.Name}({itemId})");
-
-            if (BlindBoxData.BlindBoxInfoMap.TryGetValue(itemId, out var blindbox))
-            {
-                var description = tooltip[ItemTooltipString.Description];
-
-                var text = $"\n已获得：{blindbox.AcquiredItems.Count()}/{blindbox.Items.Count}";
-                description.Payloads.Add(new TextPayload(text));
-
-                tooltip[ItemTooltipString.Description] = description;
-            }
-
         }
     }
 }
