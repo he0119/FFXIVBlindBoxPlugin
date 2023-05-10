@@ -1,6 +1,5 @@
 // 物品获取信息
 
-
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Component.Exd;
 using Lumina.Excel.GeneratedSheets;
@@ -17,23 +16,13 @@ namespace BlindBoxPlugin
         public static bool HasAcquired(Item item)
         {
             var action = item.ItemAction.Value;
-
-            if (action == null)
-            {
-                return false;
-            }
+            if (action == null) return false;
 
             var type = (ActionType)action.Type;
-
             if (type != ActionType.Cards)
             {
                 var itemExdPtr = ExdModule.GetItemRowById(item.RowId);
-                if (itemExdPtr != null)
-                {
-                    return UIState.Instance()->IsItemActionUnlocked(itemExdPtr) == 1;
-                }
-
-                return false;
+                return itemExdPtr != null && UIState.Instance()->IsItemActionUnlocked(itemExdPtr) == 1;
             }
 
             var cardId = item.AdditionalData;
