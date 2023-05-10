@@ -53,13 +53,12 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v3
       - name: Get Tag Name
-        id: version
-        run: echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+        shell: bash
+        run: echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
       - name: Upload Release Assets
-        run: gh release upload --clobber $TAG_NAME build/latest.zip
+        run: gh release upload --clobber ${{ env.TAG_NAME }} build/latest.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG_NAME: ${{ steps.version.outputs.TAG_NAME }}
       - name: Run generator
         run: .\.github\scripts\Make-Repo.ps1
       - name: Commit and Push
