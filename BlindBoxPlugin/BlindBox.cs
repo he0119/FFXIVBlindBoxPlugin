@@ -35,7 +35,6 @@ namespace BlindBoxPlugin
         {
             PluginConfig = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
             PluginConfig.Initialize(PluginInterface);
-            GameFunctions.Initialize();
             Common = new XivCommonBase(Hooks.Tooltips);
             Common.Functions.Tooltips.OnItemTooltip += OnItemTooltip;
 
