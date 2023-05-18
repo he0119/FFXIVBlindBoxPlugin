@@ -27,9 +27,9 @@ jobs:
           dotnet-version: 7.0.x
       - name: Download latest Dalamud build
         run: |
-          curl -O https://goatcorp.github.io/dalamud-distrib/latest.zip
+          curl -O https://ottercorp.github.io/dalamud-distrib/latest.7z
           mkdir BlindBoxPlugin/Dalamud
-          unzip latest.zip -d ./BlindBoxPlugin/Dalamud
+          7z x latest.7z -oBlindBoxPlugin/Dalamud
       - name: Build
         run: dotnet build BlindBoxPlugin -c Release -o build
         env:
