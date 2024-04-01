@@ -33,7 +33,7 @@ jobs:
       - name: Build
         run: dotnet build BlindBoxPlugin -c Release -o build
         env:
-          DALAMUD_HOME: ${{ github.workspace }}/Dalamud/
+          DALAMUD_HOME: ${{ github.workspace }}/BlindBoxPlugin/Dalamud/
       - name: Upload Files
         uses: actions/upload-artifact@v3
         with:
