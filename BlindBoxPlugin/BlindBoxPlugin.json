@@ -1,5 +1,5 @@
 {
-  "Author": "he0119",
+  "Author": "uy/sun",
   "Name": "Blind Box",
   "Punchline": "查看盲盒中物品的获得情况。",
   "Description": "用来统计盲盒中物品获得情况的插件。\n/blindbox 打开盲盒信息界面。\n/blindbox config 打开设置界面。",
