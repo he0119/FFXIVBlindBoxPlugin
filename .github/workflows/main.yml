@@ -24,7 +24,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: 7.0.x
       - name: Download latest Dalamud build
         run: |
           curl -O https://ottercorp.github.io/dalamud-distrib/latest.7z
@@ -33,7 +33,7 @@ jobs:
       - name: Build
         run: dotnet build BlindBoxPlugin -c Release -o build
         env:
-          DalamudLibPath: ${{ github.workspace }}/Dalamud/
+          DALAMUD_HOME: ${{ github.workspace }}/Dalamud/
       - name: Upload Files
         uses: actions/upload-artifact@v3
         with:
