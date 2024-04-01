@@ -10,7 +10,7 @@
     <Description>A blind box plugin.</Description>
     <Copyright></Copyright>
     <PackageProjectUrl>https://github.com/he0119/FFXIVBlindBoxPlugin</PackageProjectUrl>
-     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
