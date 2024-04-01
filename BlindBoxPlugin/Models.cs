@@ -26,12 +26,12 @@ namespace BlindBoxPlugin
     {
         public static string[] Names()
         {
-            return new[]
-            {
+            return
+            [
                 "所有",
                 "已获得",
                 "未获得"
-            };
+            ];
         }
     }
 }
