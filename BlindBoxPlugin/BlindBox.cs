@@ -1,9 +1,8 @@
-using Dalamud.Data;
-using Dalamud.Game;
 using Dalamud.Game.Command;
 using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
 using Dalamud.Plugin;
+using Dalamud.Plugin.Services;
 
 namespace BlindBoxPlugin
 {
@@ -12,19 +11,22 @@ namespace BlindBoxPlugin
         public string Name => "Blind Box";
         private const string commandName = "/blindbox";
 
-        [PluginService] public static DalamudPluginInterface PluginInterface { get; private set; } = null!;
-        [PluginService] public static CommandManager CommandManager { get; private set; } = null!;
-        [PluginService] public static DataManager DataManager { get; private set; } = null!;
-        [PluginService] public static SigScanner SigScanner { get; private set; } = null!;
-
-        public readonly Configuration PluginConfig;
+        private DalamudPluginInterface PluginInterface { get; init; }
+        private ICommandManager CommandManager { get; init; }
+        public Configuration PluginConfig { get; init; }
+        [PluginService] public static IDataManager DataManager { get; set; } = null!;
 
         private readonly WindowSystem windowSystem = new("BlindBox");
         public readonly StatusWindow statusWindow;
         public readonly ConfigWindow configWindow;
 
-        public BlindBox()
+        public BlindBox(
+            [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface,
+            [RequiredVersion("1.0")] ICommandManager commandManager)
         {
+            PluginInterface = pluginInterface;
+            CommandManager = commandManager;
+
             PluginConfig = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
             PluginConfig.Initialize(PluginInterface);
 

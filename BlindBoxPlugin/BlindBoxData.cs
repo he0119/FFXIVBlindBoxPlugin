@@ -22,14 +22,14 @@ namespace BlindBoxPlugin
             UniqueItems = GetItems(uniqueItemIds);
         }
 
-        private Item GetItem(uint id)
+        private static Item GetItem(uint id)
         {
             var item = BlindBox.DataManager.GetExcelSheet<Item>()?.GetRow(id);
             if (item == null) return new Item();
             return item;
         }
 
-        private List<Item> GetItems(List<uint> ids)
+        private static List<Item> GetItems(List<uint> ids)
         {
             return ids.Select(id => GetItem(id)).ToList();
         }
@@ -47,7 +47,7 @@ namespace BlindBoxPlugin
 
     public class BlindBoxData
     {
-        public static Dictionary<ulong, BlindBoxInfo> BlindBoxInfoMap = new()
+        public static readonly Dictionary<ulong, BlindBoxInfo> BlindBoxInfoMap = new()
         {
             // 特殊配给货箱（重生/苍穹）
             [36635] = new BlindBoxInfo(
