@@ -1,4 +1,3 @@
-using Dalamud.Game;
 using Dalamud.Game.Command;
 using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
@@ -16,7 +15,6 @@ namespace BlindBoxPlugin
         private ICommandManager CommandManager { get; init; }
         public Configuration PluginConfig { get; init; }
         [PluginService] public static IDataManager DataManager { get; set; } = null!;
-        [PluginService] public static SigScanner SigScanner { get; set; } = null!;
 
         private readonly WindowSystem windowSystem = new("BlindBox");
         public readonly StatusWindow statusWindow;
