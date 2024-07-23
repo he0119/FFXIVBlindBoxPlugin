@@ -41,6 +41,7 @@ namespace BlindBoxPlugin
             });
 
             PluginInterface.UiBuilder.Draw += Draw;
+            PluginInterface.UiBuilder.OpenMainUi += OpenMainUi;
             PluginInterface.UiBuilder.OpenConfigUi += OpenConfigUi;
         }
 
@@ -49,6 +50,7 @@ namespace BlindBoxPlugin
             CommandManager.RemoveHandler(commandName);
             windowSystem.RemoveAllWindows();
             PluginInterface.UiBuilder.Draw -= Draw;
+            PluginInterface.UiBuilder.OpenMainUi -= OpenMainUi;
             PluginInterface.UiBuilder.OpenConfigUi -= OpenConfigUi;
         }
 
@@ -68,6 +70,11 @@ namespace BlindBoxPlugin
         private void Draw()
         {
             windowSystem.Draw();
+        }
+
+        private void OpenMainUi()
+        {
+            statusWindow.IsOpen = true;
         }
 
         private void OpenConfigUi()
