@@ -90,7 +90,7 @@ namespace BlindBoxPlugin
                 ImGui.EndChild();
             }
         }
-        private static void DrawBlindBoxItem(string name, bool unique)
+        private void DrawBlindBoxItem(string name, bool unique)
         {
             if (unique)
             {

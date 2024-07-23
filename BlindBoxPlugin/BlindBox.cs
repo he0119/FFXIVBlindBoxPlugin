@@ -8,7 +8,7 @@ namespace BlindBoxPlugin
 {
     public sealed class BlindBox : IDalamudPlugin
     {
-        public static string Name => "Blind Box";
+        public string Name => "Blind Box";
         private const string commandName = "/blindbox";
 
         private DalamudPluginInterface PluginInterface { get; init; }
