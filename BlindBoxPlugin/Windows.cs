@@ -105,7 +105,7 @@ namespace BlindBoxPlugin
     {
         private readonly BlindBox Plugin;
         private string _text = "";
-        private List<String> _result = new List<string>();
+        private List<string> _result = [];
 
         public ConfigWindow(BlindBox plugin) : base("盲盒设置")
         {
@@ -142,13 +142,13 @@ namespace BlindBoxPlugin
                     ImGui.Text("=>");
                     ImGui.SameLine();
                     ImGui.SetNextItemWidth(windowsWidth * 0.5f - 22);
-                    var result = String.Join("\n", _result);
+                    var result = string.Join("\n", _result);
                     ImGui.InputTextMultiline("##result", ref result, ushort.MaxValue, new Vector2(0, 0), ImGuiInputTextFlags.ReadOnly);
 
                     if (ImGui.Button("转换"))
                     {
                         var items = _text.Split('\n');
-                        List<String> itemIds = new();
+                        List<string> itemIds = [];
 
                         foreach (var item in items)
                         {
@@ -163,12 +163,11 @@ namespace BlindBoxPlugin
                             }
                         }
                         _result = itemIds;
-                        // ImGui.SetClipboardText(String.Join(",", itemIds));
                     }
                     ImGui.SameLine();
                     if (ImGui.Button("输出到剪贴板"))
                     {
-                        ImGui.SetClipboardText(String.Join(",", _result));
+                        ImGui.SetClipboardText(string.Join(",", _result));
                     }
 
                     ImGui.EndTabItem();
