@@ -28,12 +28,12 @@ namespace BlindBoxPlugin.Windows
         {
             // 选择盲盒显示内容
             var displayModes = Enum.GetNames<DisplayMode>();
-            var displayModeIndex = (int)Plugin.PluginConfig.DisplayMode;
+            var displayModeIndex = (int)Plugin.Configuration.DisplayMode;
             ImGui.SetNextItemWidth(80);
             if (ImGui.Combo("显示物品的种类", ref displayModeIndex, DisplayModeNames.Names(), displayModes.Length))
             {
-                Plugin.PluginConfig.DisplayMode = (DisplayMode)displayModeIndex;
-                Plugin.PluginConfig.Save();
+                Plugin.Configuration.DisplayMode = (DisplayMode)displayModeIndex;
+                Plugin.Configuration.Save();
             }
 
             // 盲盒选择
@@ -43,10 +43,10 @@ namespace BlindBoxPlugin.Windows
                 foreach (var item in BlindBoxData.BlindBoxInfoMap)
                 {
                     var blindbox = item.Value;
-                    if (ImGui.Selectable(blindbox.Item.Name, blindbox.Item.RowId == Plugin.PluginConfig.SelectedItem))
+                    if (ImGui.Selectable(blindbox.Item.Name, blindbox.Item.RowId == Plugin.Configuration.SelectedItem))
                     {
-                        Plugin.PluginConfig.SelectedItem = blindbox.Item.RowId;
-                        Plugin.PluginConfig.Save();
+                        Plugin.Configuration.SelectedItem = blindbox.Item.RowId;
+                        Plugin.Configuration.Save();
                     }
                 }
                 ImGui.EndChild();
@@ -55,9 +55,9 @@ namespace BlindBoxPlugin.Windows
             // 盲盒内容
             if (ImGui.BeginChild("Contents", new Vector2(-1, -1), true))
             {
-                if (BlindBoxData.BlindBoxInfoMap.TryGetValue(Plugin.PluginConfig.SelectedItem, out var blindBox))
+                if (BlindBoxData.BlindBoxInfoMap.TryGetValue(Plugin.Configuration.SelectedItem, out var blindBox))
                 {
-                    switch (Plugin.PluginConfig.DisplayMode)
+                    switch (Plugin.Configuration.DisplayMode)
                     {
                         case DisplayMode.All:
                             foreach (var item in blindBox.Items)
