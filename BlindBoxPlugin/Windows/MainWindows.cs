@@ -1,27 +1,25 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using Dalamud.Interface.Windowing;
 using ImGuiNET;
-using Lumina.Excel.GeneratedSheets;
 
-namespace BlindBoxPlugin
+namespace BlindBoxPlugin.Windows
 {
-    public class StatusWindow : Window, IDisposable
+    public class MainWindow : Window, IDisposable
     {
-        private readonly BlindBox Plugin;
+        private readonly Plugin Plugin;
 
-        public StatusWindow(BlindBox plugin) : base("盲盒信息")
+        // We give this window a hidden ID using ##
+        // So that the user will see "My Amazing Window" as window title,
+        // but for ImGui the ID is "My Amazing Window##With a hidden ID"
+        public MainWindow(Plugin plugin) : base("盲盒信息")
         {
-            Plugin = plugin;
-
-            // 默认为关闭
-            IsOpen = false;
+            Flags = ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse;
 
             SizeConstraints = new WindowSizeConstraints { MinimumSize = new Vector2(500, 300), MaximumSize = new Vector2(float.MaxValue, float.MaxValue) };
             SizeCondition = ImGuiCond.FirstUseEver;
-            Flags = ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse;
+
+            Plugin = plugin;
         }
 
         public void Dispose() { }
@@ -90,7 +88,7 @@ namespace BlindBoxPlugin
                 ImGui.EndChild();
             }
         }
-        private void DrawBlindBoxItem(string name, bool unique)
+        private static void DrawBlindBoxItem(string name, bool unique)
         {
             if (unique)
             {
@@ -98,83 +96,6 @@ namespace BlindBoxPlugin
                 ImGui.SameLine();
             }
             ImGui.Text(name);
-        }
-    }
-
-    public class ConfigWindow : Window, IDisposable
-    {
-        private readonly BlindBox Plugin;
-        private string _text = "";
-        private List<string> _result = [];
-
-        public ConfigWindow(BlindBox plugin) : base("盲盒设置")
-        {
-            Plugin = plugin;
-
-            // 默认为关闭
-            IsOpen = false;
-
-            SizeConstraints = new WindowSizeConstraints
-            {
-                MinimumSize = new Vector2(480, 270),
-                MaximumSize = new Vector2(float.MaxValue, float.MaxValue)
-            };
-            SizeCondition = ImGuiCond.Always;
-            Flags = ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse;
-        }
-
-        public void Dispose() { }
-
-        public override void Draw()
-        {
-            if (ImGui.BeginTabBar("BlindBoxTabBar", ImGuiTabBarFlags.AutoSelectNewTabs))
-            {
-                if (ImGui.BeginTabItem("数据转换"))
-                {
-                    var windowsWidth = ImGui.GetWindowWidth();
-                    var text = _text;
-                    ImGui.SetNextItemWidth(windowsWidth * 0.5f - 22);
-                    if (ImGui.InputTextMultiline("##text", ref text, ushort.MaxValue, new Vector2(0, 0)))
-                    {
-                        _text = text;
-                    }
-                    ImGui.SameLine();
-                    ImGui.Text("=>");
-                    ImGui.SameLine();
-                    ImGui.SetNextItemWidth(windowsWidth * 0.5f - 22);
-                    var result = string.Join("\n", _result);
-                    ImGui.InputTextMultiline("##result", ref result, ushort.MaxValue, new Vector2(0, 0), ImGuiInputTextFlags.ReadOnly);
-
-                    if (ImGui.Button("转换"))
-                    {
-                        var items = _text.Split('\n');
-                        List<string> itemIds = [];
-
-                        foreach (var item in items)
-                        {
-                            var i = BlindBox.DataManager.GetExcelSheet<Item>()?.Where(i => i.Name == item).FirstOrDefault();
-                            if (i != null)
-                            {
-                                itemIds.Add(i.RowId.ToString());
-                            }
-                            else
-                            {
-                                itemIds.Add("名称有误");
-                            }
-                        }
-                        _result = itemIds;
-                    }
-                    ImGui.SameLine();
-                    if (ImGui.Button("输出到剪贴板"))
-                    {
-                        ImGui.SetClipboardText(string.Join(",", _result));
-                    }
-
-                    ImGui.EndTabItem();
-                }
-
-                ImGui.EndTabBar();
-            }
         }
     }
 }
