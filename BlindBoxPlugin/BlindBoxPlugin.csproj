@@ -5,10 +5,8 @@
   <PropertyGroup>
     <Authors>uy/sun</Authors>
     <Title>BlindBoxPlugin</Title>
-    <Company></Company>
     <Version>1.6.1.0</Version>
     <Description>A blind box plugin.</Description>
-    <Copyright></Copyright>
     <PackageProjectUrl>https://github.com/he0119/FFXIVBlindBoxPlugin</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <IsPackable>false</IsPackable>
