@@ -26,7 +26,7 @@ namespace BlindBoxPlugin
             }
 
             var cardId = item.AdditionalData;
-            var card = BlindBox.DataManager.GetExcelSheet<TripleTriadCard>()!.GetRow(cardId);
+            var card = Plugin.DataManager.GetExcelSheet<TripleTriadCard>()!.GetRow(cardId);
             return card != null && UIState.Instance()->IsTripleTriadCardUnlocked((ushort)card.RowId);
         }
     }

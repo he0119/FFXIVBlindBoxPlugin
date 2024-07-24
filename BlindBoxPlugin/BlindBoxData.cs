@@ -24,7 +24,7 @@ namespace BlindBoxPlugin
 
         private static Item GetItem(uint id)
         {
-            var item = BlindBox.DataManager.GetExcelSheet<Item>()?.GetRow(id);
+            var item = Plugin.DataManager.GetExcelSheet<Item>()?.GetRow(id);
             if (item == null) return new Item();
             return item;
         }

@@ -1,3 +1,4 @@
+using BlindBoxPlugin.Windows;
 using Dalamud.Game.Command;
 using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
@@ -6,52 +7,54 @@ using Dalamud.Plugin.Services;
 
 namespace BlindBoxPlugin
 {
-    public sealed class BlindBox : IDalamudPlugin
+    public sealed class Plugin : IDalamudPlugin
     {
+        [PluginService] internal static DalamudPluginInterface PluginInterface { get; private set; } = null!;
+        [PluginService] internal static ICommandManager CommandManager { get; private set; } = null!;
+        [PluginService] internal static IDataManager DataManager { get; private set; } = null!;
+
         public string Name => "Blind Box";
-        private const string commandName = "/blindbox";
+        private const string CommandName = "/blindbox";
 
-        private DalamudPluginInterface PluginInterface { get; init; }
-        private ICommandManager CommandManager { get; init; }
-        public Configuration PluginConfig { get; init; }
-        [PluginService] public static IDataManager DataManager { get; set; } = null!;
+        public Configuration Configuration { get; init; }
 
-        private readonly WindowSystem windowSystem = new("BlindBox");
-        public readonly StatusWindow statusWindow;
-        public readonly ConfigWindow configWindow;
+        public readonly WindowSystem WindowSystem = new("BlindBox");
+        private ConfigWindow ConfigWindow { get; init; }
+        private MainWindow MainWindow { get; init; }
 
-        public BlindBox(
-            [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface,
-            [RequiredVersion("1.0")] ICommandManager commandManager)
+        public Plugin()
         {
-            PluginInterface = pluginInterface;
-            CommandManager = commandManager;
+            Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
 
-            PluginConfig = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
-            PluginConfig.Initialize(PluginInterface);
+            MainWindow = new MainWindow(this);
+            ConfigWindow = new ConfigWindow(this);
 
-            statusWindow = new StatusWindow(this);
-            configWindow = new ConfigWindow(this);
-            windowSystem.AddWindow(statusWindow);
-            windowSystem.AddWindow(configWindow);
+            WindowSystem.AddWindow(MainWindow);
+            WindowSystem.AddWindow(ConfigWindow);
 
-            CommandManager.AddHandler(commandName, new CommandInfo(OnCommand)
+            CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
             {
                 HelpMessage = "打开盲盒信息界面。"
             });
 
-            PluginInterface.UiBuilder.Draw += Draw;
-            PluginInterface.UiBuilder.OpenMainUi += OpenMainUi;
-            PluginInterface.UiBuilder.OpenConfigUi += OpenConfigUi;
+            PluginInterface.UiBuilder.Draw += DrawUI;
+
+            // This adds a button to the plugin installer entry of this plugin which allows
+            // to toggle the display status of the configuration ui
+            PluginInterface.UiBuilder.OpenConfigUi += ToggleConfigUI;
+
+            // Adds another button that is doing the same but for the main ui of the plugin
+            PluginInterface.UiBuilder.OpenMainUi += ToggleMainUI;
         }
 
         public void Dispose()
         {
-            CommandManager.RemoveHandler(commandName);
-            windowSystem.RemoveAllWindows();
-            PluginInterface.UiBuilder.Draw -= Draw;
-            PluginInterface.UiBuilder.OpenMainUi -= OpenMainUi;
-            PluginInterface.UiBuilder.OpenConfigUi -= OpenConfigUi;
+            WindowSystem.RemoveAllWindows();
+
+            ConfigWindow.Dispose();
+            MainWindow.Dispose();
+
+            CommandManager.RemoveHandler(CommandName);
         }
 
         private void OnCommand(string command, string args)
@@ -59,27 +62,16 @@ namespace BlindBoxPlugin
             // in response to the slash command, just display our main ui
             if (args == "config")
             {
-                configWindow.IsOpen = true;
+                ConfigWindow.Toggle();
             }
             else
             {
-                statusWindow.IsOpen = true;
+                MainWindow.Toggle();
             }
         }
 
-        private void Draw()
-        {
-            windowSystem.Draw();
-        }
-
-        private void OpenMainUi()
-        {
-            statusWindow.IsOpen = true;
-        }
-
-        private void OpenConfigUi()
-        {
-            configWindow.IsOpen = true;
-        }
+        private void DrawUI() => WindowSystem.Draw();
+        public void ToggleConfigUI() => ConfigWindow.Toggle();
+        public void ToggleMainUI() => MainWindow.Toggle();
     }
 }

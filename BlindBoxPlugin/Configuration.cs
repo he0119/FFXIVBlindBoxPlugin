@@ -1,5 +1,4 @@
 using Dalamud.Configuration;
-using Dalamud.Plugin;
 using System;
 
 namespace BlindBoxPlugin
@@ -10,21 +9,13 @@ namespace BlindBoxPlugin
         public int Version { get; set; } = 0;
         public uint SelectedItem { get; set; } = 0;
 
-
         // 显示盲盒物品模式
         public DisplayMode DisplayMode { get; set; } = DisplayMode.Missing;
 
-        [NonSerialized]
-        private DalamudPluginInterface? pluginInterface;
-
-        public void Initialize(DalamudPluginInterface pluginInterface)
-        {
-            this.pluginInterface = pluginInterface;
-        }
-
+        // the below exist just to make saving less cumbersome
         public void Save()
         {
-            pluginInterface!.SavePluginConfig(this);
+            Plugin.PluginInterface.SavePluginConfig(this);
         }
     }
 }
