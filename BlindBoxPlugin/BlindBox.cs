@@ -13,6 +13,7 @@ namespace BlindBoxPlugin
         [PluginService] internal static ICommandManager CommandManager { get; private set; } = null!;
         [PluginService] internal static IDataManager DataManager { get; private set; } = null!;
 
+        public string Name => "Blind Box";
         private const string CommandName = "/blindbox";
 
         public Configuration Configuration { get; init; }
