@@ -27,7 +27,7 @@ jobs:
           dotnet-version: 8.0.x
       - name: Download latest Dalamud build
         run: |
-          curl -O https://ottercorp.github.io/dalamud-distrib/latest.7z
+          curl -O https://raw.githubusercontent.com/ottercorp/dalamud-distrib/refs/heads/main/latest.7z
           mkdir BlindBoxPlugin/Dalamud
           7z x latest.7z -oBlindBoxPlugin/Dalamud
       - name: Build
