@@ -4,7 +4,7 @@ using System.Linq;
 using System.Numerics;
 using Dalamud.Interface.Windowing;
 using ImGuiNET;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 namespace BlindBoxPlugin.Windows
 {
@@ -64,7 +64,8 @@ namespace BlindBoxPlugin.Windows
                             var i = Plugin.DataManager.GetExcelSheet<Item>()?.Where(i => i.Name == item).FirstOrDefault();
                             if (i != null)
                             {
-                                itemIds.Add(i.RowId.ToString());
+                                // 如果名称正确，添加到结果列表
+                                itemIds.Add(i.Value.RowId.ToString());
                             }
                             else
                             {
