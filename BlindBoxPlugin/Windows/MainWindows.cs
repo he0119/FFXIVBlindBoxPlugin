@@ -43,7 +43,7 @@ namespace BlindBoxPlugin.Windows
                 foreach (var item in BlindBoxData.BlindBoxInfoMap)
                 {
                     var blindbox = item.Value;
-                    if (ImGui.Selectable(blindbox.Item.Name, blindbox.Item.RowId == Plugin.Configuration.SelectedItem))
+                    if (ImGui.Selectable(blindbox.Item.Name.ToString(), blindbox.Item.RowId == Plugin.Configuration.SelectedItem))
                     {
                         Plugin.Configuration.SelectedItem = blindbox.Item.RowId;
                         Plugin.Configuration.Save();
@@ -62,19 +62,19 @@ namespace BlindBoxPlugin.Windows
                         case DisplayMode.All:
                             foreach (var item in blindBox.Items)
                             {
-                                DrawBlindBoxItem(item.Name, blindBox.UniqueItems.Contains(item));
+                                DrawBlindBoxItem(item.Name.ToString(), blindBox.UniqueItems.Contains(item));
                             }
                             break;
                         case DisplayMode.Acquired:
                             foreach (var item in blindBox.AcquiredItems)
                             {
-                                DrawBlindBoxItem(item.Name, blindBox.UniqueItems.Contains(item));
+                                DrawBlindBoxItem(item.Name.ToString(), blindBox.UniqueItems.Contains(item));
                             }
                             break;
                         case DisplayMode.Missing:
                             foreach (var item in blindBox.MissingItems)
                             {
-                                DrawBlindBoxItem(item.Name, blindBox.UniqueItems.Contains(item));
+                                DrawBlindBoxItem(item.Name.ToString(), blindBox.UniqueItems.Contains(item));
                             }
                             break;
                         default:

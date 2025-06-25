@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 namespace BlindBoxPlugin
 {
@@ -26,7 +26,7 @@ namespace BlindBoxPlugin
         {
             var item = Plugin.DataManager.GetExcelSheet<Item>()?.GetRow(id);
             if (item == null) return new Item();
-            return item;
+            return item.Value;
         }
 
         private static List<Item> GetItems(List<uint> ids)
@@ -36,12 +36,12 @@ namespace BlindBoxPlugin
 
         public List<Item> AcquiredItems
         {
-            get => Items.Where(item => GameFunctions.HasAcquired(item)).ToList();
+            get => [.. Items.Where(item => GameFunctions.IsUnlocked(item))];
         }
 
         public List<Item> MissingItems
         {
-            get => Items.Where(item => !GameFunctions.HasAcquired(item)).ToList();
+            get => [.. Items.Where(item => !GameFunctions.IsUnlocked(item))];
         }
     }
 
